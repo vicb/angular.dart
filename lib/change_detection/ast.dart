@@ -32,21 +32,20 @@ class FieldReadAST extends AST {
   final String name;
   final String expression;
 
-  FieldReadAST(lhs, name):
-      lhs = lhs,
-      name = name,
-      expression = lhs.expression == null ? name : '${lhs.expression}.$name';
+  FieldReadAST(lhs, name)
+      : lhs = lhs,
+        name = name,
+        expression = lhs.expression == null ? name : '${lhs.expression}.$name';
 
-  WatchRecord<_Handler> setupWatch(WatchGroup scope) {
-    return scope.addFieldWatch(lhs, name, expression);
-  }
+  WatchRecord<_Handler> setupWatch(WatchGroup scope) =>
+      scope.addFieldWatch(lhs, name, expression);
 }
 
 /**
  * SYNTAX: fn(arg0, arg1, ...)
  *
- * This is invokes a pure function. Pure means that the function has no state, and therefore
- * it needs to be re-computed only if its args change..
+ * Invoke a pure function. Pure means that the function has no state, and
+ * therefore it needs to be re-computed only if its args change.
  */
 class PureFunctionAST extends AST {
   final String name;
@@ -54,14 +53,13 @@ class PureFunctionAST extends AST {
   final List<AST> argsAST;
   final String expression;
 
-  PureFunctionAST(name, this.fn, argsAST):
-      argsAST = argsAST,
-      name = name,
-      expression = '$name(${_argList(argsAST)})';
+  PureFunctionAST(name, this.fn, argsAST)
+      : argsAST = argsAST,
+        name = name,
+        expression = '$name(${_argList(argsAST)})';
 
-  WatchRecord<_Handler> setupWatch(WatchGroup scope) {
-    return scope.addFunctionWatch(fn, argsAST, expression);
-  }
+  WatchRecord<_Handler> setupWatch(WatchGroup scope) =>
+      scope.addFunctionWatch(fn, argsAST, expression);
 }
 
 /**
@@ -75,15 +73,14 @@ class MethodAST extends AST {
   final List<AST> argsAST;
   final String expression;
 
-  MethodAST(lhsAST, name, argsAST):
-  lhsAST = lhsAST,
-  name = name,
-  argsAST = argsAST,
-  expression = '${lhsAST.expression}.$name(${_argList(argsAST)})';
+  MethodAST(lhsAST, name, argsAST)
+      : lhsAST = lhsAST,
+        name = name,
+        argsAST = argsAST,
+        expression = '${lhsAST.expression}.$name(${_argList(argsAST)})';
 
-  WatchRecord<_Handler> setupWatch(WatchGroup scope) {
-    return scope.addMethodWatch(lhsAST, name, argsAST, expression);
-  }
+  WatchRecord<_Handler> setupWatch(WatchGroup scope) =>
+      scope.addMethodWatch(lhsAST, name, argsAST, expression);
 }
 
 _argList(List<AST> items) => items.map((a) => a.expression).join(', ');

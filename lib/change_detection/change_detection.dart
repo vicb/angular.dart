@@ -1,16 +1,18 @@
 library change_detection;
 
 /**
- * An interface for [ChangeDetectorGroup] groups related watches together. It guarentees
- * that within the group all watches will be reported in the order in which they were registered.
- * It also provides an efficient way of removing the watch group.
+ * An interface for [ChangeDetectorGroup] groups related watches together. It
+ * guarentees that within the group all watches will be reported in the order in
+ * which they were registered. It also provides an efficient way of removing the
+ * watch group.
  */
 abstract class ChangeDetectorGroup<H> {
   /**
    * Watch a specific [field] on an [object].
    *
    * If the [field] is:
-   *   - _name_ - Name of the field to watch. (If the [object is a Map then treat it as a key.)
+   *   - _name_ - Name of the field to watch. (If the [object] is a Map then
+   *   treat it as a key.)
    *   - _[]_ - Watch all items in an array.
    *   - _{}_ - Watch all items in a Map.
    *   - _._ - Watch the actual object identity.
@@ -32,12 +34,13 @@ abstract class ChangeDetectorGroup<H> {
 }
 
 /**
- * An interface for [ChangeDetector]. An application can have multiple instance of the
- * [ChangeDetector] to be used for checking different application domains.
+ * An interface for [ChangeDetector]. An application can have multiple instances
+ * of the [ChangeDetector] to be used for checking different application domains.
  *
- * [ChangeDetector] works by comparing the identity of the objects not by calling the [.equals()]
- * method. This is because ChangeDetector needs to have predictable performance, and the
- * developer can implement [.equals()] on top of identity checks.
+ * [ChangeDetector] works by comparing the identity of the objects not by
+ * calling the `.equals()` method. This is because ChangeDetector needs to have
+ * predictable performance, and the developer can implement `.equals()` on top
+ * of identity checks.
  *
  * - [H] A [ChangeRecord] has associated handler object. The handler object is opaque to the
  *   [ChangeDetector] but it is meaningful to the code which registered the watcher. It can be
@@ -68,9 +71,9 @@ abstract class Record<H> {
   String get field;
 
   /**
-   *  The handler is an application provided object which contains the specific logic
-   *  which needs to be applied when the change is detected. The handler is opaque to the
-   *  ChangeDetector and as such can be anything the application desires.
+   * An application provided object which contains the specific logic which
+   * needs to be applied when the change is detected. The handler is opaque to
+   * the ChangeDetector and as such can be anything the application desires.
    */
   H get handler;
 
@@ -98,9 +101,9 @@ abstract class WatchRecord<H> extends Record<H> {
 }
 
 /**
- * A change record provides information about the changes which were detected in objects.
+ * Provides information about the changes which were detected in objects.
  *
- * It exposes a nextChange method for traversing all of the changes.
+ * It exposes a `nextChange` method for traversing all of the changes.
  */
 abstract class ChangeRecord<H> extends Record<H> {
   /** Next [ChangeRecord] */
@@ -108,10 +111,11 @@ abstract class ChangeRecord<H> extends Record<H> {
 }
 
 /**
- * If [ChangeDetector] is watching a collection (an [Iterable]) then the [currentValue] of [Record]
- * will contain this object. The object contains a summary of changes to the collection since
- * last execution. The changes are reported a list of [CollectionChangeItem]s which contain the
- * current and previous position in the list as well as the item.
+ * If [ChangeDetector] is watching a collection (an [Iterable]) then the
+ * [currentValue] of [Record] will contain this object. The object contains a
+ * summary of changes to the collection since the last execution. The changes
+ * are reported as a list of [CollectionChangeItem]s which contain the current
+ * and previous position in the list as well as the item.
  */
 abstract class CollectionChangeRecord<K, V> {
 
@@ -126,8 +130,8 @@ abstract class CollectionChangeRecord<K, V> {
 }
 
 /**
- * Each item in collection is wrapped in [CollectionChangeItem], which can track the
- * [item]s [currentKey] and [previousKey] location.
+ * Each item in collection is wrapped in [CollectionChangeItem], which can track
+ * the [item]s [currentKey] and [previousKey] location.
  */
 abstract class CollectionChangeItem<K, V> {
   /** Previous item location in the list or [null] if addition. */
