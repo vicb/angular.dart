@@ -56,30 +56,29 @@ collectionIteration() {
 }
 
 fieldRead() {
-  var watchGrp = new RootWatchGroup(new DirtyCheckingChangeDetector<_Handler>(getterCache), new Obj());
-  watchGrp.watch(parse('a'), reactionFn);
-  watchGrp.watch(parse('b'), reactionFn);
-  watchGrp.watch(parse('c'), reactionFn);
-  watchGrp.watch(parse('d'), reactionFn);
-  watchGrp.watch(parse('e'), reactionFn);
+  var watchGrp = new RootWatchGroup(
+      new DirtyCheckingChangeDetector<_Handler>(getterCache), new Obj())
+      ..watch(parse('a'), reactionFn)
+      ..watch(parse('b'), reactionFn)
+      ..watch(parse('c'), reactionFn)
+      ..watch(parse('d'), reactionFn)
+      ..watch(parse('e'), reactionFn)
+      ..watch(parse('f'), reactionFn)
+      ..watch(parse('g'), reactionFn)
+      ..watch(parse('h'), reactionFn)
+      ..watch(parse('i'), reactionFn)
+      ..watch(parse('j'), reactionFn)
+      ..watch(parse('k'), reactionFn)
+      ..watch(parse('l'), reactionFn)
+      ..watch(parse('m'), reactionFn)
+      ..watch(parse('n'), reactionFn)
+      ..watch(parse('o'), reactionFn)
+      ..watch(parse('p'), reactionFn)
+      ..watch(parse('q'), reactionFn)
+      ..watch(parse('r'), reactionFn)
+      ..watch(parse('s'), reactionFn)
+      ..watch(parse('t'), reactionFn);
 
-  watchGrp.watch(parse('f'), reactionFn);
-  watchGrp.watch(parse('g'), reactionFn);
-  watchGrp.watch(parse('h'), reactionFn);
-  watchGrp.watch(parse('i'), reactionFn);
-  watchGrp.watch(parse('j'), reactionFn);
-
-  watchGrp.watch(parse('k'), reactionFn);
-  watchGrp.watch(parse('l'), reactionFn);
-  watchGrp.watch(parse('m'), reactionFn);
-  watchGrp.watch(parse('n'), reactionFn);
-  watchGrp.watch(parse('o'), reactionFn);
-
-  watchGrp.watch(parse('p'), reactionFn);
-  watchGrp.watch(parse('q'), reactionFn);
-  watchGrp.watch(parse('r'), reactionFn);
-  watchGrp.watch(parse('s'), reactionFn);
-  watchGrp.watch(parse('t'), reactionFn);
   print('Watch: ${watchGrp.fieldCost}; eval: ${watchGrp.evalCost}');
 
   time('fieldRead', () => watchGrp.detectChanges());
@@ -92,30 +91,29 @@ fieldReadGetter() {
     "k": (o) => o.k, "l": (o) => o.l, "m": (o) => o.m, "n": (o) => o.n, "o": (o) => o.o,
     "p": (o) => o.p, "q": (o) => o.q, "r": (o) => o.r, "n": (o) => o.s, "t": (o) => o.t,
   });
-  var watchGrp = new RootWatchGroup(new DirtyCheckingChangeDetector<_Handler>(getterCache), new Obj());
-  watchGrp.watch(parse('a'), reactionFn);
-  watchGrp.watch(parse('b'), reactionFn);
-  watchGrp.watch(parse('c'), reactionFn);
-  watchGrp.watch(parse('d'), reactionFn);
-  watchGrp.watch(parse('e'), reactionFn);
+  var  watchGrp= new RootWatchGroup(
+      new DirtyCheckingChangeDetector<_Handler>(getterCache), new Obj())
+      ..watch(parse('a'), reactionFn)
+      ..watch(parse('b'), reactionFn)
+      ..watch(parse('c'), reactionFn)
+      ..watch(parse('d'), reactionFn)
+      ..watch(parse('e'), reactionFn)
+      ..watch(parse('f'), reactionFn)
+      ..watch(parse('g'), reactionFn)
+      ..watch(parse('h'), reactionFn)
+      ..watch(parse('i'), reactionFn)
+      ..watch(parse('j'), reactionFn)
+      ..watch(parse('k'), reactionFn)
+      ..watch(parse('l'), reactionFn)
+      ..watch(parse('m'), reactionFn)
+      ..watch(parse('n'), reactionFn)
+      ..watch(parse('o'), reactionFn)
+      ..watch(parse('p'), reactionFn)
+      ..watch(parse('q'), reactionFn)
+      ..watch(parse('r'), reactionFn)
+      ..watch(parse('s'), reactionFn)
+      ..watch(parse('t'), reactionFn);
 
-  watchGrp.watch(parse('f'), reactionFn);
-  watchGrp.watch(parse('g'), reactionFn);
-  watchGrp.watch(parse('h'), reactionFn);
-  watchGrp.watch(parse('i'), reactionFn);
-  watchGrp.watch(parse('j'), reactionFn);
-
-  watchGrp.watch(parse('k'), reactionFn);
-  watchGrp.watch(parse('l'), reactionFn);
-  watchGrp.watch(parse('m'), reactionFn);
-  watchGrp.watch(parse('n'), reactionFn);
-  watchGrp.watch(parse('o'), reactionFn);
-
-  watchGrp.watch(parse('p'), reactionFn);
-  watchGrp.watch(parse('q'), reactionFn);
-  watchGrp.watch(parse('r'), reactionFn);
-  watchGrp.watch(parse('s'), reactionFn);
-  watchGrp.watch(parse('t'), reactionFn);
   print('Watch: ${watchGrp.fieldCost}; eval: ${watchGrp.evalCost}');
 
   time('fieldReadGetter', () => watchGrp.detectChanges());
@@ -127,30 +125,29 @@ mapRead() {
       'f': 0, 'g': 1, 'h': 2, 'i': 3, 'j': 4,
       'k': 0, 'l': 1, 'm': 2, 'n': 3, 'o': 4,
       'p': 0, 'q': 1, 'r': 2, 's': 3, 't': 4};
-  var watchGrp = new RootWatchGroup(new DirtyCheckingChangeDetector<_Handler>(getterCache), map);
-  watchGrp.watch(parse('a'), reactionFn);
-  watchGrp.watch(parse('b'), reactionFn);
-  watchGrp.watch(parse('c'), reactionFn);
-  watchGrp.watch(parse('d'), reactionFn);
-  watchGrp.watch(parse('e'), reactionFn);
+  var watchGrp = new RootWatchGroup(
+      new DirtyCheckingChangeDetector<_Handler>(getterCache), map)
+      ..watch(parse('a'), reactionFn)
+      ..watch(parse('b'), reactionFn)
+      ..watch(parse('c'), reactionFn)
+      ..watch(parse('d'), reactionFn)
+      ..watch(parse('e'), reactionFn)
+      ..watch(parse('f'), reactionFn)
+      ..watch(parse('g'), reactionFn)
+      ..watch(parse('h'), reactionFn)
+      ..watch(parse('i'), reactionFn)
+      ..watch(parse('j'), reactionFn)
+      ..watch(parse('k'), reactionFn)
+      ..watch(parse('l'), reactionFn)
+      ..watch(parse('m'), reactionFn)
+      ..watch(parse('n'), reactionFn)
+      ..watch(parse('o'), reactionFn)
+      ..watch(parse('p'), reactionFn)
+      ..watch(parse('q'), reactionFn)
+      ..watch(parse('r'), reactionFn)
+      ..watch(parse('s'), reactionFn)
+      ..watch(parse('t'), reactionFn);
 
-  watchGrp.watch(parse('f'), reactionFn);
-  watchGrp.watch(parse('g'), reactionFn);
-  watchGrp.watch(parse('h'), reactionFn);
-  watchGrp.watch(parse('i'), reactionFn);
-  watchGrp.watch(parse('j'), reactionFn);
-
-  watchGrp.watch(parse('k'), reactionFn);
-  watchGrp.watch(parse('l'), reactionFn);
-  watchGrp.watch(parse('m'), reactionFn);
-  watchGrp.watch(parse('n'), reactionFn);
-  watchGrp.watch(parse('o'), reactionFn);
-
-  watchGrp.watch(parse('p'), reactionFn);
-  watchGrp.watch(parse('q'), reactionFn);
-  watchGrp.watch(parse('r'), reactionFn);
-  watchGrp.watch(parse('s'), reactionFn);
-  watchGrp.watch(parse('t'), reactionFn);
   print('Watch: ${watchGrp.fieldCost}; eval: ${watchGrp.evalCost}');
   time('mapRead', () => watchGrp.detectChanges());
 }
@@ -158,27 +155,29 @@ mapRead() {
 methodInvoke0() {
   var context = new Obj();
   context.a = new Obj();
-  var watchGrp = new RootWatchGroup(new DirtyCheckingChangeDetector<_Handler>(getterCache), context);
-  watchGrp.watch(method('a', 'methodA'), reactionFn);
-  watchGrp.watch(method('a', 'methodB'), reactionFn);
-  watchGrp.watch(method('a', 'methodC'), reactionFn);
-  watchGrp.watch(method('a', 'methodD'), reactionFn);
-  watchGrp.watch(method('a', 'methodE'), reactionFn);
-  watchGrp.watch(method('a', 'methodF'), reactionFn);
-  watchGrp.watch(method('a', 'methodG'), reactionFn);
-  watchGrp.watch(method('a', 'methodH'), reactionFn);
-  watchGrp.watch(method('a', 'methodI'), reactionFn);
-  watchGrp.watch(method('a', 'methodJ'), reactionFn);
-  watchGrp.watch(method('a', 'methodK'), reactionFn);
-  watchGrp.watch(method('a', 'methodL'), reactionFn);
-  watchGrp.watch(method('a', 'methodM'), reactionFn);
-  watchGrp.watch(method('a', 'methodN'), reactionFn);
-  watchGrp.watch(method('a', 'methodO'), reactionFn);
-  watchGrp.watch(method('a', 'methodP'), reactionFn);
-  watchGrp.watch(method('a', 'methodQ'), reactionFn);
-  watchGrp.watch(method('a', 'methodR'), reactionFn);
-  watchGrp.watch(method('a', 'methodS'), reactionFn);
-  watchGrp.watch(method('a', 'methodT'), reactionFn);
+  var watchGrp = new RootWatchGroup(
+      new DirtyCheckingChangeDetector<_Handler>(getterCache), context)
+      ..watch(method('a', 'methodA'), reactionFn)
+      ..watch(method('a', 'methodB'), reactionFn)
+      ..watch(method('a', 'methodC'), reactionFn)
+      ..watch(method('a', 'methodD'), reactionFn)
+      ..watch(method('a', 'methodE'), reactionFn)
+      ..watch(method('a', 'methodF'), reactionFn)
+      ..watch(method('a', 'methodG'), reactionFn)
+      ..watch(method('a', 'methodH'), reactionFn)
+      ..watch(method('a', 'methodI'), reactionFn)
+      ..watch(method('a', 'methodJ'), reactionFn)
+      ..watch(method('a', 'methodK'), reactionFn)
+      ..watch(method('a', 'methodL'), reactionFn)
+      ..watch(method('a', 'methodM'), reactionFn)
+      ..watch(method('a', 'methodN'), reactionFn)
+      ..watch(method('a', 'methodO'), reactionFn)
+      ..watch(method('a', 'methodP'), reactionFn)
+      ..watch(method('a', 'methodQ'), reactionFn)
+      ..watch(method('a', 'methodR'), reactionFn)
+      ..watch(method('a', 'methodS'), reactionFn)
+      ..watch(method('a', 'methodT'), reactionFn);
+
   print('Watch: ${watchGrp.fieldCost}; eval: ${watchGrp.evalCost}');
   time('obj.method?()', () => watchGrp.detectChanges());
 }
@@ -186,54 +185,58 @@ methodInvoke0() {
 methodInvoke1() {
   var context = new Obj();
   context.a = new Obj();
-  var watchGrp = new RootWatchGroup(new DirtyCheckingChangeDetector<_Handler>(getterCache), context);
-  watchGrp.watch(method('a', 'methodA', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodB', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodC', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodD', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodE', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodF', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodG', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodH', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodI', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodJ', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodK', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodL', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodM', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodN', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodO', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodP', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodQ', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodR', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodS', [parse('a')]), reactionFn);
-  watchGrp.watch(method('a', 'methodT', [parse('a')]), reactionFn);
+  var watchGrp = new RootWatchGroup(
+      new DirtyCheckingChangeDetector<_Handler>(getterCache), context)
+      ..watch(method('a', 'methodA', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodB', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodC', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodD', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodE', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodF', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodG', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodH', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodI', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodJ', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodK', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodL', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodM', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodN', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodO', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodP', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodQ', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodR', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodS', [parse('a')]), reactionFn)
+      ..watch(method('a', 'methodT', [parse('a')]), reactionFn);
+
   print('Watch: ${watchGrp.fieldCost}; eval: ${watchGrp.evalCost}');
   time('obj.method?(obj)', () => watchGrp.detectChanges());
 }
 
 function2() {
   var context = new Obj();
-  var watchGrp = new RootWatchGroup(new DirtyCheckingChangeDetector<_Handler>(getterCache), context);
-  watchGrp.watch(add(0, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(1, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(2, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(3, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(4, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(5, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(6, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(7, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(8, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(9, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(10, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(11, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(12, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(13, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(14, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(15, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(16, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(17, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(18, parse('a'), parse('a')), reactionFn);
-  watchGrp.watch(add(19, parse('a'), parse('a')), reactionFn);
+  var watchGrp = new RootWatchGroup(
+      new DirtyCheckingChangeDetector<_Handler>(getterCache), context)
+      ..watch(add(0, parse('a'), parse('a')), reactionFn)
+      ..watch(add(1, parse('a'), parse('a')), reactionFn)
+      ..watch(add(2, parse('a'), parse('a')), reactionFn)
+      ..watch(add(3, parse('a'), parse('a')), reactionFn)
+      ..watch(add(4, parse('a'), parse('a')), reactionFn)
+      ..watch(add(5, parse('a'), parse('a')), reactionFn)
+      ..watch(add(6, parse('a'), parse('a')), reactionFn)
+      ..watch(add(7, parse('a'), parse('a')), reactionFn)
+      ..watch(add(8, parse('a'), parse('a')), reactionFn)
+      ..watch(add(9, parse('a'), parse('a')), reactionFn)
+      ..watch(add(10, parse('a'), parse('a')), reactionFn)
+      ..watch(add(11, parse('a'), parse('a')), reactionFn)
+      ..watch(add(12, parse('a'), parse('a')), reactionFn)
+      ..watch(add(13, parse('a'), parse('a')), reactionFn)
+      ..watch(add(14, parse('a'), parse('a')), reactionFn)
+      ..watch(add(15, parse('a'), parse('a')), reactionFn)
+      ..watch(add(16, parse('a'), parse('a')), reactionFn)
+      ..watch(add(17, parse('a'), parse('a')), reactionFn)
+      ..watch(add(18, parse('a'), parse('a')), reactionFn)
+      ..watch(add(19, parse('a'), parse('a')), reactionFn);
+
   print('Watch: ${watchGrp.fieldCost}; eval: ${watchGrp.evalCost}');
   time('add?(a, a)', () => watchGrp.detectChanges());
 }
