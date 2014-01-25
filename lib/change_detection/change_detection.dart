@@ -42,15 +42,16 @@ abstract class ChangeDetectorGroup<H> {
  * predictable performance, and the developer can implement `.equals()` on top
  * of identity checks.
  *
- * - [H] A [ChangeRecord] has associated handler object. The handler object is opaque to the
- *   [ChangeDetector] but it is meaningful to the code which registered the watcher. It can be
- *   data structure, object, or function. It is up to the developer to attach meaning to it.
+ * - [H] A [ChangeRecord] has associated handler object. The handler object is
+ * opaque to the [ChangeDetector] but it is meaningful to the code which
+ * registered the watcher. It can be a data structure, an object, or a function.
+ * It is up to the developer to attach meaning to it.
  */
 abstract class ChangeDetector<H> extends ChangeDetectorGroup<H> {
   /**
-   * This method does the work of collecting the changes and returns them as a linked list of
-   * [ChangeRecord]s. The [ChangeRecord]s are to be returned in the same order as they were
-   * registered.
+   * This method does the work of collecting the changes and returns them as a
+   * linked list of [ChangeRecord]s. The [ChangeRecord]s are to be returned in
+   * the same order as they were registered.
    */
   ChangeRecord<H> collectChanges();
 }
@@ -78,22 +79,22 @@ abstract class Record<H> {
   H get handler;
 
   /** Current value of the [field] on the [object] */
-  dynamic get currentValue;
+  get currentValue;
   /** Previous value of the [field] on the [object] */
-  dynamic get previousValue;
+  get previousValue;
 }
 
 /**
- * [WatchRecord] API which allows changing what object is being watched and manually triggering the
- * checking.
+ * [WatchRecord] API which allows changing what object is being watched and
+ * manually triggering the checking.
  */
 abstract class WatchRecord<H> extends Record<H> {
   /** Set a new object for checking */
-  set object(dynamic value);
+  set object(value);
 
   /**
-   * Check to see if the field on the object has changed. Returns [null] if no change, or a
-   * [ChangeRecord] if the change has been detected.
+   * Check to see if the field on the object has changed. Returns [null] if no
+   * change, or a [ChangeRecord] if the change has been detected.
    */
   ChangeRecord<H> check();
 

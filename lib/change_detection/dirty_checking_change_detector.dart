@@ -3,7 +3,8 @@ library dirty_checking_change_detector;
 import 'dart:mirrors';
 import 'package:angular/change_detection/change_detection.dart';
 
-typedef dynamic FieldGetter(dynamic objec);
+typedef FieldGetter(object);
+
 class GetterCache {
   Map<String, FieldGetter> _map;
 
@@ -57,7 +58,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
   /**
    * All records for group are kept together and are denoted by head/tail.
    */
-  DirtyCheckingRecord _recordHead, _recordTail;
+  DirtyCheckingRecord _head, _tail;
 
   /**
    * ChangeDetectorGroup is organized hierarchically, a root group can have
@@ -69,14 +70,15 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
   DirtyCheckingChangeDetectorGroup(this._parent, this._getterCache) {
     // we need to insert the marker record at the beginning.
     if (_parent == null) {
-      _recordHead = _recordTail = _marker;
+      _head = _marker;
+      _tail = _marker;
     } else {
       // we need to find the tail of previous record
       // If we are first then it is the tail of the parent group
       // otherwise it is the tail of the previous group
       DirtyCheckingChangeDetectorGroup tail = _parent._childTail;
-      _recordTail = (tail == null ? _parent : tail)._recordTail;
-      _recordHead = _recordTail = _recordAdd(_marker);
+      _tail = (tail == null ? _parent : tail)._recordTail;
+      _head = _tail = _recordAdd(_marker);
     }
   }
 
@@ -85,9 +87,9 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
    */
   get count {
     int count = 0;
-    DirtyCheckingRecord cursor = _recordHead == _marker ?
-        _recordHead._nextWatch :
-        _recordHead;
+    DirtyCheckingRecord cursor = _head == _marker ?
+        _head._nextWatch :
+        _head;
     while (cursor != null) {
       count++;
       cursor = cursor._nextWatch;
@@ -120,7 +122,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
    * Bulk remove all records.
    */
   void remove() {
-    DirtyCheckingRecord previousRecord = _recordHead._prevWatch;
+    DirtyCheckingRecord previousRecord = _head._prevWatch;
     var childTail = _childTail == null ? this : _childTail;
     DirtyCheckingRecord nextRecord = childTail._recordTail._nextWatch;
 
@@ -143,7 +145,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
   }
 
   _recordAdd(DirtyCheckingRecord record) {
-    DirtyCheckingRecord previous = _recordTail;
+    DirtyCheckingRecord previous = _tail;
     DirtyCheckingRecord next = previous == null ? null : previous._nextWatch;
 
     record._nextWatch = next;
@@ -152,7 +154,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
     if (previous != null) previous._nextWatch = record;
     if (next != null) next._prevWatch = record;
 
-    _recordTail = record;
+    _tail = record;
 
     if (previous == _marker) _recordRemove(_marker);
 
@@ -163,16 +165,16 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
     DirtyCheckingRecord previous = record._prevWatch;
     DirtyCheckingRecord next = record._nextWatch;
 
-    if (record == _recordHead && record == _recordTail) {
+    if (record == _head && record == _tail) {
       // we are the last one, must leave marker behind.
-      _recordHead = _recordTail = _marker;
+      _head = _tail = _marker;
       _marker._nextWatch = next;
       _marker._prevWatch = previous;
       if (previous != null) previous._nextWatch = _marker;
       if (next != null) next._prevWatch = _marker;
     } else {
-      if (record == _recordTail) _recordTail = previous;
-      if (record == _recordHead) _recordHead = next;
+      if (record == _tail) _tail = previous;
+      if (record == _head) _head = next;
       if (previous != null) previous._nextWatch = next;
       if (next != null) next._prevWatch = previous;
     }
@@ -182,7 +184,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
     var lines = [];
     if (_parent == null) {
       var allRecords = [];
-      DirtyCheckingRecord record = _recordHead;
+      DirtyCheckingRecord record = _head;
       while (record != null) {
         allRecords.add(record.toString());
         record = record._nextWatch;
@@ -191,8 +193,8 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
     }
 
     var records = [];
-    DirtyCheckingRecord record = _recordHead;
-    while (record != _recordTail) {
+    DirtyCheckingRecord record = _head;
+    while (record != _tail) {
       records.add(record.toString());
       record = record._nextWatch;
     }
@@ -215,9 +217,9 @@ class DirtyCheckingChangeDetector<H> extends DirtyCheckingChangeDetectorGroup<H>
   DirtyCheckingRecord<H> collectChanges() {
     DirtyCheckingRecord changeHead = null;
     DirtyCheckingRecord changeTail = null;
-    DirtyCheckingRecord current = _recordHead; // current index
+    DirtyCheckingRecord current = _head; // current index
 
-    while(current != null) {
+    while (current != null) {
       if (current.check() != null) {
         if (changeHead == null) {
           changeHead = changeTail = current;
@@ -237,12 +239,13 @@ class DirtyCheckingChangeDetector<H> extends DirtyCheckingChangeDetectorGroup<H>
 }
 
 /**
- * [DirtyCheckingRecord] represents as single item to check. The heart of the [DirtyCheckingRecord] is a the
- * [check] method which can read the [currentValue] and compare it to the [previousValue].
+ * [DirtyCheckingRecord] represents as single item to check. The heart of the
+ * [DirtyCheckingRecord] is a the [check] method which can read the
+ * [currentValue] and compare it to the [previousValue].
  *
- * [DirtyCheckingRecord]s form linked list. This makes traversal, adding, and removing efficient. [DirtyCheckingRecord]
- * also has [nextChange] field which creates a single linked list of all of the changes for
- * efficient traversal.
+ * [DirtyCheckingRecord]s form linked list. This makes traversal, adding, and
+ * removing efficient. [DirtyCheckingRecord] also has a [nextChange] field which
+ * creates a single linked list of all of the changes for efficient traversal.
  */
 class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
   static const List<String> _MODE_NAMES =
@@ -264,12 +267,12 @@ class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
 
   int _mode;
 
-  dynamic previousValue;
-  dynamic currentValue;
+  var previousValue;
+  var currentValue;
   DirtyCheckingRecord<H> _nextWatch;
   DirtyCheckingRecord<H> _prevWatch;
   ChangeRecord<H> nextChange;
-  dynamic _object;
+  var _object;
   InstanceMirror _instanceMirror;
 
   DirtyCheckingRecord(this._group, this._object, fieldName, this._getter,
@@ -288,8 +291,9 @@ class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
   get object => _object;
 
   /**
-   * Setting an [object] will cause the setter to introspect it and place [DirtyCheckingRecord] into different
-   * access modes. If Object it sets up reflection. If [Map] then it sets up map accessor.
+   * Setting an [object] will cause the setter to introspect it and place
+   * [DirtyCheckingRecord] into different access modes. If Object it sets up
+   * reflection. If [Map] then it sets up map accessor.
    */
   set object(obj) {
     this._object = obj;
@@ -353,7 +357,7 @@ class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
           last == current) {
         // This is false change in strings we need to recover, and pretend it
         // is the same. We save the value so that next time identity will pass
-        currentValue = current; //
+        currentValue = current;
       } else {
         previousValue = last;
         currentValue = current;
@@ -704,27 +708,38 @@ class _CollectionChangeRecord<K, V> implements CollectionChangeRecord<K, V> {
 
     var list = [];
     record = _collectionHead;
-    while(record != null) {list.add(record); record = record._nextRec;};
+    while(record != null) {
+      list.add(record);
+      record = record._nextRec;
+    }
 
     var additions = [];
     record = _additionsHead;
-    while(record != null) {additions.add(record); record = record._nextAddedRec;};
+    while(record != null) {
+      additions.add(record);
+      record = record._nextAddedRec;
+    }
 
     var moves = [];
     record = _movesHead;
-    while(record != null) {moves.add(record); record = record._nextMovedRec;};
+    while(record != null) {
+      moves.add(record);
+      record = record._nextMovedRec;
+    }
 
     var removals = [];
     record = _removalsHead;
-    while(record != null) {removals.add(record); record = record._nextRemovedRec;};
+    while(record != null) {
+      removals.add(record);
+      record = record._nextRemovedRec;
+    }
 
-    var lines = []
-        ..add('collection: ${list.join(", ")}')
-        ..add('additions: ${additions.join(", ")}')
-        ..add('moves: ${moves.join(", ")}')
-        ..add('removals: ${removals.join(", ")}');
-
-    return lines.join('\n');
+    return """
+collection: ${list.join(", ")}
+additions: ${additions.join(", ")}
+moves: ${moves.join(", ")}
+removals: ${removals.join(", ")}'
+    """;
   }
 }
 
@@ -824,12 +839,14 @@ class _DuplicateItemRecordList {
  * This is a custom map which supports duplicate [ItemRecord] values for each key.
  */
 class DuplicateMap {
-  final Map<dynamic, _DuplicateItemRecordList> map = new Map<dynamic, _DuplicateItemRecordList>();
+  final Map<dynamic, _DuplicateItemRecordList> map =
+      new Map<dynamic, _DuplicateItemRecordList>();
 
   void put(ItemRecord record, [ItemRecord beforeRecord = null]) {
     assert(record._nextDupRec == null);
     assert(record._prevDupRec == null);
-    map.putIfAbsent(record.item, () => new _DuplicateItemRecordList()).add(record, beforeRecord);
+    map.putIfAbsent(record.item, () =>
+        new _DuplicateItemRecordList()).add(record, beforeRecord);
   }
 
   /**
@@ -848,7 +865,6 @@ class DuplicateMap {
   }
 
   ItemRecord remove(ItemRecord record) {
-    //print('REMOVE$hashCode $record');
     _DuplicateItemRecordList recordList = map[record.item];
     assert(recordList != null);
     if (recordList.remove(record)) {
