@@ -57,13 +57,11 @@ abstract class ChangeDetector<H> extends ChangeDetectorGroup<H> {
 }
 
 abstract class Record<H> {
-  /** The object where the change occurred. */
+  /** The observed object. */
   Object get object;
 
   /**
-   * The field which is being watched.
-   *
-   * The string is:
+   * The field which is being watched:
    *   - _name_ - Name of the field to watch.
    *   - _[]_ - Watch all items in an array.
    *   - _{}_ - Watch all items in a Map.

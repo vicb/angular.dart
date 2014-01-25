@@ -41,8 +41,9 @@ main() => describe('DirtyCheckingChangeDetector', () {
       expect(change.nextChange.previousValue).toEqual('');
       expect(change.nextChange.nextChange).toEqual(null);
 
+      // force different instance
       user.first = 'mis';
-      user.first += 'ko'; // force different instance;
+      user.first += 'ko';
 
       change = detector.collectChanges();
       expect(change).toEqual(null);

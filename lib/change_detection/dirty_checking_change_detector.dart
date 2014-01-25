@@ -77,7 +77,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
       // If we are first then it is the tail of the parent group
       // otherwise it is the tail of the previous group
       DirtyCheckingChangeDetectorGroup tail = _parent._childTail;
-      _tail = (tail == null ? _parent : tail)._recordTail;
+      _tail = (tail == null ? _parent : tail)._tail;
       _head = _tail = _recordAdd(_marker);
     }
   }
@@ -124,7 +124,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
   void remove() {
     DirtyCheckingRecord previousRecord = _head._prevWatch;
     var childTail = _childTail == null ? this : _childTail;
-    DirtyCheckingRecord nextRecord = childTail._recordTail._nextWatch;
+    DirtyCheckingRecord nextRecord = childTail._tail._nextWatch;
 
     if (previousRecord != null) previousRecord._nextWatch = nextRecord;
     if (nextRecord != null) nextRecord._prevWatch = previousRecord;
@@ -275,10 +275,12 @@ class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
   var _object;
   InstanceMirror _instanceMirror;
 
-  DirtyCheckingRecord(this._group, this._object, fieldName, this._getter,
+  DirtyCheckingRecord(this._group, obj, fieldName, this._getter,
       this.handler)
       : field = fieldName,
-        _symbol = fieldName == null ? null : new Symbol(fieldName);
+        _symbol = fieldName == null ? null : new Symbol(fieldName) {
+    object = obj;
+  }
 
   DirtyCheckingRecord.marker()
       : _group = null,
@@ -326,9 +328,8 @@ class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
 
   ChangeRecord<H> check() {
     var current;
-    int mode = _mode;
 
-    switch (mode) {
+    switch (_mode) {
       case _MODE_MARKER_:
         return null;
       case _MODE_REFLECT_:
