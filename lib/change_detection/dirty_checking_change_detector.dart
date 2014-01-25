@@ -246,14 +246,15 @@ class DirtyCheckingChangeDetector<H> extends DirtyCheckingChangeDetectorGroup<H>
  */
 class DirtyCheckingRecord<H> implements ChangeRecord<H>, WatchRecord<H> {
   static const List<String> _MODE_NAMES =
-      const ['MARKER', 'IDENT', 'OBJECT', 'MAP', 'LIST_CHANGE', 'MAP_CHANGE'];
+      const ['MARKER', 'IDENT', 'OBJECT', 'GETTER', 'MAP.FIELD', 'LIST_CHANGE',
+      'MAP_CHANGE'];
   static const int _MODE_MARKER_ = 0;
   static const int _MODE_IDENTITY_ = 1;
   static const int _MODE_REFLECT_ = 2;
-  static const int _MODE_GETTER_ = 4;
-  static const int _MODE_MAP_FIELD_ = 5;
-  static const int _MODE_ITERABLE_ = 6;
-  static const int _MODE_MAP_ = 7;
+  static const int _MODE_GETTER_ = 3;
+  static const int _MODE_MAP_FIELD_ = 4;
+  static const int _MODE_ITERABLE_ = 5;
+  static const int _MODE_MAP_ = 6;
 
   final DirtyCheckingChangeDetectorGroup _group;
   final String field;
