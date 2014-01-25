@@ -646,7 +646,7 @@ class _CollectionChangeRecord<K, V> implements CollectionChangeRecord<K, V> {
     }
 
     _items.put(record);
-    return record.currentKey = index;
+    return record..currentKey = index;
   }
 
   ItemRecord _collection_remove(ItemRecord record) =>
