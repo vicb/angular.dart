@@ -71,12 +71,12 @@ class ScopeEvent {
  * value. Digest keeps checking the state of the watcher getters until it
  * can execute one full iteration with no watchers triggering. TTL is used
  * to prevent an infinite loop where watch A triggers watch B which in turn
- * triggers watch A. If the system does not stabilize in TTL iteration then
- * an digest is stop an an exception is thrown.
+ * triggers watch A. If the system does not stabilize in TTL iterations then
+ * the digest is stopped and an exception is thrown.
  */
 @NgInjectableService()
 class ScopeDigestTTL {
-  final num ttl;
+  final int ttl;
   ScopeDigestTTL(): ttl = 5;
   ScopeDigestTTL.value(this.ttl);
 }
@@ -91,22 +91,31 @@ class ScopeLocals implements Map {
 
   ScopeLocals(this._scope, this._locals);
 
-  operator []=(String name, value) => _scope[name] = value;
-  operator [](String name) => (_locals.containsKey(name) ? _locals : _scope)[name];
+  void operator []=(String name, value) {
+    _scope[name] = value;
+  }
+  dynamic operator [](String name) =>
+      (_locals.containsKey(name) ? _locals : _scope)[name];
 
-  get isEmpty => _scope.isEmpty && _locals.isEmpty;
-  get isNotEmpty => _scope.isNotEmpty || _locals.isNotEmpty;
-  get keys => _scope.keys;
-  get values => _scope.values;
-  get length => _scope.length;
+  bool get isEmpty => _scope.isEmpty && _locals.isEmpty;
+  bool get isNotEmpty => _scope.isNotEmpty || _locals.isNotEmpty;
+  List<String> get keys => _scope.keys;
+  List get values => _scope.values;
+  int get length => _scope.length;
 
-  forEach(fn) => _scope.forEach(fn);
-  remove(key) => _scope.remove(key);
-  clear() => _scope.clear;
-  containsKey(key) => _scope.containsKey(key);
-  containsValue(key) => _scope.containsValue(key);
-  addAll(map) => _scope.addAll(map);
-  putIfAbsent(key, fn) => _scope.putIfAbsent(key, fn);
+  void forEach(fn) {
+    _scope.forEach(fn);
+  }
+  dynamic remove(key) => _scope.remove(key);
+  void clear() {
+    _scope.clear;
+  }
+  bool containsKey(key) => _scope.containsKey(key);
+  bool containsValue(key) => _scope.containsValue(key);
+  void addAll(map) {
+    _scope.addAll(map);
+  }
+  dynamic putIfAbsent(key, fn) => _scope.putIfAbsent(key, fn);
 }
 
 class Scope {
@@ -131,7 +140,7 @@ class Scope {
   // A better way to do this is to remove the parser from the scope.
   Watch watchSet(List<String> exprs, Function reactionFn) {
     var expr = '{{${exprs.join('}}?{{')}}}';
-    List items = exprs.map(rootScope._parse).toList();
+    var items = exprs.map(rootScope._parse).toList();
     AST ast = new PureFunctionAST(expr, new ArrayFn(), items);
     return watchGroup.watch(ast, reactionFn);
   }
@@ -157,12 +166,10 @@ class Scope {
     if (expression is String && expression.isNotEmpty) {
       var obj = locals == null ? context : new ScopeLocals(context, locals);
       return rootScope._parser(expression).eval(obj);
-    } else if (expression is EvalFunction1) {
+    } else {
       assert(locals == null);
-      return expression(context);
-    } else if (expression is EvalFunction0) {
-      assert(locals == null);
-      return expression();
+      if (expression is EvalFunction1) return expression(context);
+      if (expression is EvalFunction0) return expression();
     }
   }
 
@@ -176,9 +183,10 @@ class Scope {
     } catch (e, s) {
       rootScope._exceptionHandler(e, s);
     } finally {
-      rootScope._transitionState(RootScope.STATE_APPLY, null);
-      rootScope.digest();
-      rootScope.flush();
+      rootScope
+          .._transitionState(RootScope.STATE_APPLY, null)
+          ..digest()
+          ..flush();
     }
   }
 
@@ -204,10 +212,18 @@ class Scope {
   }
 
   void destroy() {
-    var prev = this._prev;
-    var next = this._next;
-    if (prev == null) _parentScope._childHead = next; else prev._next = next;
-    if (next == null) _parentScope._childTail = prev; else next._prev = prev;
+    var prev = _prev;
+    var next = _next;
+    if (prev == null) {
+      _parentScope._childHead = next;
+    } else {
+      prev._next = next;
+    }
+    if (next == null) {
+      _parentScope._childTail = prev;
+    } else {
+      next._prev = prev;
+    }
 
     this._next = this._prev = null;
 
@@ -265,15 +281,17 @@ class RootScope extends Scope {
       ChangeLog changeLog;
       do {
         while(_runAsyncHead != null) {
-          try { _runAsyncHead.fn(); }
-          catch (e, s) { _exceptionHandler(e, s); }
+          try {
+            _runAsyncHead.fn();
+          } catch (e, s) {
+            _exceptionHandler(e, s);
+          }
           _runAsyncHead = _runAsyncHead._next;
         }
 
         digestTTL--;
         count = rootWatchGroup.detectChanges(
-            exceptionHandler: _exceptionHandler,
-            changeLog: changeLog);
+            exceptionHandler: _exceptionHandler, changeLog: changeLog);
 
         if (digestTTL <= LOG_COUNT) {
           if (changeLog == null) {
@@ -286,7 +304,7 @@ class RootScope extends Scope {
           }
         }
         if (digestTTL == 0) {
-          throw 'Model did not stabilize in ${_ttl.ttl} digests. ' +
+          throw 'Model did not stabilize in ${_ttl.ttl} digests. '
                 'Last $LOG_COUNT iterations:\n${log.join('\n')}';
         }
       } while (count > 0);
@@ -302,8 +320,12 @@ class RootScope extends Scope {
     try {
       do {
         while(_domWriteHead != null) {
-          try { _domWriteHead.fn(); }
-          catch (e, s) { _exceptionHandler(e, s); }
+          try {
+            _domWriteHead.fn();
+          }
+          catch (e, s) {
+            _exceptionHandler(e, s);
+          }
           _domWriteHead = _domWriteHead._next;
         }
         if (runObservers) {
@@ -311,8 +333,12 @@ class RootScope extends Scope {
           observeGroup.detectChanges(exceptionHandler:_exceptionHandler);
         }
         while(_domReadHead != null) {
-          try { _domReadHead.fn(); }
-          catch (e, s) { _exceptionHandler(e, s); }
+          try {
+            _domReadHead.fn();
+          }
+          catch (e, s) {
+            _exceptionHandler(e, s);
+          }
           _domReadHead = _domReadHead._next;
         }
       } while (_domWriteHead != null || _domReadHead != null);
@@ -362,7 +388,6 @@ class RootScope extends Scope {
     }
   }
 
-
   AST _parse(expression) => visitor.visit(_parser.call(expression));
   void destroy() {}
 
@@ -384,7 +409,7 @@ class RootScope extends Scope {
  * have one. But that means that we have to keep track if the stream belongs
  * to the node.
  *
- * Scope with [_ScopeStreams] but who's [_scope] dose not match the scope
+ * Scope with [_ScopeStreams] but who's [_scope] does not match the scope
  * is only inherited
  *
  * Only [Scope] with [_ScopeStreams] who's [_scope] matches the [Scope]
@@ -399,18 +424,18 @@ class _Streams {
   /// Scope we belong to.
   final Scope _scope;
   /// [Stream]s for [_scope] only
-  final Map<String, ScopeStream> _streams = new Map<String, ScopeStream>();
+  final _streams = new Map<String, ScopeStream>();
   /// Child [Scope] event counts.
   final Map<String, int> _typeCounts;
 
   _Streams(this._scope, this._exceptionHandler, _Streams inheritStreams)
       : _typeCounts = inheritStreams == null
-          ? new Map<String, int>()
+          ? <String, int>{}
           : new Map.from(inheritStreams._typeCounts);
 
   static ScopeEvent emit(Scope scope, String name, data) {
-    ScopeEvent event = new ScopeEvent(name, scope, data);
-    Scope scopeCursor = scope;
+    var event = new ScopeEvent(name, scope, data);
+    var scopeCursor = scope;
     while(scopeCursor != null) {
       if (scopeCursor._streams._scope == scopeCursor) {
         ScopeStream stream = scopeCursor._streams._streams[name];
@@ -427,10 +452,10 @@ class _Streams {
 
   static ScopeEvent broadcast(Scope scope, String name, data) {
     _Streams scopeStreams = scope._streams;
-    ScopeEvent event = new ScopeEvent(name, scope, data);
+    var event = new ScopeEvent(name, scope, data);
     if (scopeStreams != null && scopeStreams._typeCounts.containsKey(name)) {
       Queue queue = new Queue()..addFirst(scopeStreams._scope);
-      while(queue.isNotEmpty) {
+      while (queue.isNotEmpty) {
         scope = queue.removeFirst();
         scopeStreams = scope._streams;
         assert(scopeStreams._scope == scope);
@@ -495,7 +520,7 @@ class _Streams {
   void _addCount(String name, int amount) {
     // decrement the counters on all parent scopes
     _Streams lastStreams = null;
-    Scope scope = _scope;
+    var scope = _scope;
     while (scope != null) {
       if (lastStreams != scope._streams) {
         // we have a transition, need to decrement it
@@ -518,7 +543,7 @@ class ScopeStream extends async.Stream<ScopeEvent> {
   final ExceptionHandler _exceptionHandler;
   final _Streams _streams;
   final String _name;
-  final List<ScopeStreamSubscription> subscriptions = [];
+  final subscriptions = <ScopeStreamSubscription>[];
 
   ScopeStream(this._streams, this._exceptionHandler, this._name);
 
@@ -707,7 +732,7 @@ class ExpressionVisitor implements Visitor {
   }
 }
 
-_operationToFunction(String operation) {
+Function _operationToFunction(String operation) {
   switch(operation) {
     case '!'  : return _operation_negate;
     case '+'  : return _operation_add;
@@ -764,12 +789,8 @@ class MapFn extends FunctionApply {
 
   apply(List values) {
     // TODO(misko): figure out why do we need to make a copy instead of reusing instance?
-    Map map = {};
     assert(values.length == keys.length);
-    for(var i = 0; i < keys.length; i++) {
-      map[keys[i]] = values[i];
-    }
-    return map;
+    return new Map.fromIterables(keys, values);
   }
 }
 
@@ -796,8 +817,8 @@ class _FilterWrapper extends FunctionApply {
     var value = Function.apply(filterFn, args);
     if (value is Iterable) {
       // Since filters are pure we can guarantee that this well never change.
-      // By wrapping in UnmodifiableListView we can hint to the dirty checker and
-      // short circuit the iterator.
+      // By wrapping in UnmodifiableListView we can hint to the dirty checker
+      // and short circuit the iterator.
       value = new UnmodifiableListView(value);
     }
     return value;
