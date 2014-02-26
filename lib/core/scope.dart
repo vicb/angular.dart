@@ -273,11 +273,7 @@ class Scope {
                           _readOnlyGroup.newGroup(childContext));
     var prev = _childTail;
     child._prev = prev;
-    if (prev == null) {
-      _childHead = child;
-    } else {
-      prev._next = child;
-    }
+    if (prev == null) _childHead = child; else prev._next = child;
     _childTail = child;
     return child;
   }
