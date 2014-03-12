@@ -18,23 +18,26 @@ class NodeAttrs {
   NodeAttrs(this.element);
 
   operator [](String attributeName) =>
+      // todo honor notified values
       element.attributes[attributeName];
 
   operator []=(String attributeName, String value) {
-    if (value == null) {
-      element.attributes.remove(attributeName);
-    } else {
-      element.attributes[attributeName] = value;
+    _notifyObservers(attributeName, value);
+    _setValue(attributeName, value);
+  }
+
+  Function setDelayed(String attributeName, String value) {
+    if (_notifyObservers(attributeName, value)) {
+      // todo coalesce writes
+      return () => _setValue(attributeName, value);
     }
-    if (_observers != null && _observers.containsKey(attributeName)) {
-      _observers[attributeName].forEach((fn) => fn(value));
-    }
+    return null;
   }
 
   /**
    * Observe changes to the attribute by invoking the [AttributeChanged]
    * function. On registration the [AttributeChanged] function gets invoked
-   * synchronise with the current value.
+   * to synchronise with the current value.
    */
   observe(String attributeName, AttributeChanged notifyFn) {
     if (_observers == null) {
@@ -54,8 +57,23 @@ class NodeAttrs {
   bool containsKey(String attributeName) =>
       element.attributes.containsKey(attributeName);
 
-  Iterable<String> get keys =>
-      element.attributes.keys;
+  Iterable<String> get keys => element.attributes.keys;
+
+  void _setValue(String attributeName, String value) {
+    if (value == null) {
+      element.attributes.remove(attributeName);
+    } else {
+      element.attributes[attributeName] = value;
+    }
+  }
+
+  bool _notifyObservers(String attributeName, String value) {
+    if (_observers != null && _observers.containsKey(attributeName)) {
+      _observers[attributeName].forEach((fn) => fn(value));
+      return true;
+    }
+    return false;
+  }
 }
 
 /**

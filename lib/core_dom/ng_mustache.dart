@@ -10,7 +10,12 @@ class NgTextMustacheDirective {
                           AstParser parser,
                           FilterMap filters) {
     Interpolation interpolation = interpolate(markup);
-    interpolation.setter = (text) => element.text = text;
+    interpolation.setter = (text) {
+      scope.rootScope.domWrite(() {
+        element.text = text;
+      });
+    };
+
 
     List items = interpolation.expressions.map((exp) {
       return parser(exp, filters:filters);
@@ -37,7 +42,9 @@ class NgAttrMustacheDirective {
     var lastValue = markup;
     interpolation.setter = (text) {
       if (lastValue != text) {
-            lastValue = attrs[attrName] = text;
+        lastValue = text;
+        var fn = attrs.setDelayed(attrName, lastValue);
+        if (fn != null) scope.rootScope.domWrite(fn);
       }
     };
     // TODO(misko): figure out how to remove call to setter. It slows down
