@@ -58,22 +58,22 @@ part of angular.routing;
 @NgDirective(
     selector: 'ng-view',
     publishTypes: const [RouteProvider],
+    children: NgAnnotation.TRANSCLUDE_CHILDREN,
     visibility: NgDirective.CHILDREN_VISIBILITY)
 class NgViewDirective implements NgDetachAware, RouteProvider {
   final NgRoutingHelper locationService;
   final ViewCache viewCache;
   final Injector injector;
-  final Element element;
   final Scope scope;
   RouteHandle _route;
+  final ViewPort _viewPort;
 
   View _view;
-  Scope _scope;
+  Scope _childScope;
   Route _viewRoute;
 
-  NgViewDirective(this.element, this.viewCache,
-                  Injector injector, Router router,
-                  this.scope)
+  NgViewDirective(this.viewCache, Injector injector,
+                  Router router, this.scope, this._viewPort)
       : injector = injector,
         locationService = injector.get(NgRoutingHelper)
   {
@@ -114,29 +114,33 @@ class NgViewDirective implements NgDetachAware, RouteProvider {
     }
 
     var newDirectives = viewInjector.get(DirectiveMap);
+
     viewCache.fromUrl(templateUrl, newDirectives).then((viewFactory) {
       _cleanUp();
-      _scope = scope.createChild(new PrototypeMap(scope.context));
-      _view = viewFactory(
-          viewInjector.createChild(
-              [new Module()..value(Scope, _scope)]));
-
-      _view.nodes.forEach((elm) => element.append(elm));
+      _childScope = scope.createChild(new PrototypeMap(scope.context));
+      var view = _view = viewFactory(viewInjector.createChild(
+          [new Module()..value(Scope, _childScope)]));
+      _childScope.rootScope.domWrite(() {
+        _viewPort.insert(view);
+      });
     });
   }
 
   _cleanUp() {
     if (_view == null) return;
 
-    _view.nodes.forEach((node) => node.remove());
-    _scope.destroy();
-
+    var view = _view;
+    _childScope.rootScope.domWrite(() {
+      _viewPort.remove(view);
+    });
+    _childScope.destroy();
     _view = null;
-    _scope = null;
+    _childScope = null;
   }
 
   Route get route => _viewRoute;
   String get routeName => _viewRoute.name;
+
   Map<String, String> get parameters {
     var res = <String, String>{};
     var p = _viewRoute;

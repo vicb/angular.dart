@@ -112,8 +112,8 @@ typedef void RouteInitializerFn(Router router, RouteViewFactory viewFactory);
 class NgRoutingHelper {
   final Router router;
   final NgApp _ngApp;
-  List<NgViewDirective> portals = <NgViewDirective>[];
-  Map<String, _View> _templates = new Map<String, _View>();
+  final portals = <NgViewDirective>[];
+  final _templates = <String, _View>{};
 
   NgRoutingHelper(RouteInitializer initializer, Injector injector, this.router, this._ngApp) {
     // TODO: move this to constructor parameters when di issue is fixed:
@@ -153,7 +153,7 @@ class NgRoutingHelper {
 
       NgViewDirective view = portals.lastWhere((NgViewDirective v) {
         return _routePath(route) != _routePath(v._route) &&
-            _routePath(route).startsWith(_routePath(v._route));
+               _routePath(route).startsWith(_routePath(v._route));
       }, orElse: () => null);
       if (view != null && !alreadyActiveViews.contains(view)) {
         view._show(templateUrl, route, viewDef.modules);
