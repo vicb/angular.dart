@@ -4,8 +4,8 @@ set -e
 
 . $(dirname $0)/env.sh
 
-OUT=tmp/all.dart
-mkdir -p tmp
+OUT=$NGDART_BASE_DIR/tmp/all.dart
+mkdir -p $(dirname $OUT)
 
 $DARTANALYZER --version
 
@@ -23,6 +23,6 @@ do
   echo export \'../$FILE\' hide main, NestedRouteInitializer\; >> $OUT
 done
 
-$(dirname $0)/generate-expressions.sh
+$NGDART_SCRIPT_DIR/generate-expressions.sh
 
 $DARTANALYZER $OUT

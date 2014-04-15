@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-. ./scripts/env.sh
+. $(dirname $0)/../env.sh
 
 SIZE_TOO_BIG_COUNT=0
 
@@ -23,13 +23,14 @@ function checkSize() {
 # skip auxiliary tests if we are only running dart2js
 if [[ $TESTS == "dart2js" ]]; then
   if [[ $CHANNEL == "DEV" ]]; then
-    dart "bin/pub_build.dart" -p example -e "example/expected_warnings.json"
+    $DART "$NGDART_BASE_DIR/bin/pub_build.dart" -p example \
+        -e "$NGDART_BASE_DIR/example/expected_warnings.json"
   else
     ( cd example; pub build )
   fi
 
   (
-    cd example
+    cd $NGDART_BASE_DIR/example
     checkSize build/web/animation.dart.js 208021
     checkSize build/web/bouncing_balls.dart.js 202325
     checkSize build/web/hello_world.dart.js 199919
@@ -42,16 +43,17 @@ if [[ $TESTS == "dart2js" ]]; then
   )
 else
   # run io tests
-  dart -c test/io/all.dart
+  $DART -c $NGDART_BASE_DIR/test/io/all.dart
 
-  ./scripts/generate-expressions.sh
-  ./scripts/analyze.sh
+  $NGDART_SCRIPT_DIR/generate-expressions.sh
+  $NGDART_SCRIPT_DIR/analyze.sh
 
-  ./node_modules/jasmine-node/bin/jasmine-node ./scripts/changelog/;
+  $NGDART_BASE_DIR/node_modules/jasmine-node/bin/jasmine-node \
+      $NGDART_SCRIPT_DIR/changelog/;
 
   (
-    cd perf
-    pub install
+    cd $NGDART_BASE_DIR/perf
+    $PUB install
     for file in *_perf.dart; do
       echo ======= $file ========
       $DART $file
@@ -66,11 +68,11 @@ elif [[ $TESTS == "vm" ]]; then
   BROWSERS=Dartium;
 fi
 
-./node_modules/jasmine-node/bin/jasmine-node playback_middleware/spec/ &&
+$NGDART_BASE_DIR/node_modules/jasmine-node/bin/jasmine-node playback_middleware/spec/ &&
   node "node_modules/karma/bin/karma" start karma.conf \
     --reporters=junit,dots --port=8765 --runner-port=8766 \
     --browsers=$BROWSERS --single-run --no-colors
 
 if [[ $TESTS != "dart2js" ]]; then
-  ./scripts/generate-documentation.sh;
+  $NGDART_SCRIPT_DIR/generate-documentation.sh;
 fi

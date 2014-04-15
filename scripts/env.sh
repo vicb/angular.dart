@@ -33,4 +33,8 @@ export DART_DOCGEN=${DART_DOCGEN:-"$DARTSDK/bin/docgen"}
 
 export DARTIUM_BIN=${DARTIUM_BIN:-"$DARTIUM"}
 export CHROME_BIN=${CHROME_BIN:-"google-chrome"}
+
 export PATH=$PATH:$DARTSDK/bin
+
+export NGDART_SCRIPT_DIR=$(dirname $(readlink -f $0))
+export NGDART_BASE_DIR=$(dirname $NGDART_SCRIPT_DIR)
