@@ -137,9 +137,7 @@ abstract class Application {
   final List<Module> modules = <Module>[];
   dom.Element element;
 
-  /**
-   * Creates a selector for a DOM element.
-   */
+  /// Creates a selector for a DOM element.
   dom.Element selector(String selector) => element = _find(selector);
 
   Application(): element = _find('[ng-app]', dom.window.document.documentElement) {
@@ -149,9 +147,7 @@ abstract class Application {
             ..bind(dom.Node, toFactory: (i) => i.get(Application).element);
   }
 
-  /**
-   * Returns the injector for this module.
-   */
+  /// injector for this module.
   Injector injector;
 
   Application addModule(Module module) {

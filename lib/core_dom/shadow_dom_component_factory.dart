@@ -1,5 +1,10 @@
 part of angular.core.dom_internal;
 
+/**
+ * [ComponentFactory] is responsible for setting up components. This includes
+ * the shadowDom, fetching template, importing styles, setting up attribute
+ * mappings, publishing the controller, and compiling and caching the template.
+ */
 abstract class ComponentFactory {
   FactoryFn call(dom.Node node, DirectiveRef ref);
 

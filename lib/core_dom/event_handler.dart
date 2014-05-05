@@ -82,10 +82,10 @@ class EventHandler {
   * be transformed into on-some-custom-event.
   */
   static String eventNameToAttrName(String eventName) {
-    var part = eventName.replaceAllMapped(new RegExp("([A-Z])"), (Match match) {
+    var part = eventName.replaceAllMapped(new RegExp('([A-Z])'), (Match match) {
       return '-${match.group(0).toLowerCase()}';
     });
-    return 'on-${part}';
+    return 'on-$part';
   }
 
   /**
@@ -93,18 +93,17 @@ class EventHandler {
   * corresponds to event named 'someCustomEvent'.
   */
   static String attrNameToEventName(String attrName) {
-    var part = attrName.startsWith("on-") ? attrName.substring(3) : attrName;
+    var part = attrName.startsWith('on-') ? attrName.substring(3) : attrName;
     part = part.replaceAllMapped(new RegExp(r'\-(\w)'), (Match match) {
       return match.group(0).toUpperCase();
     });
-    return part.replaceAll("-", "");
+    return part.replaceAll('-', '');
   }
 }
 
 @Injectable()
 class ShadowRootEventHandler extends EventHandler {
-  ShadowRootEventHandler(dom.ShadowRoot shadowRoot,
-                         Expando expando,
+  ShadowRootEventHandler(dom.ShadowRoot shadowRoot, Expando expando,
                          ExceptionHandler exceptionHandler)
       : super(shadowRoot, expando, exceptionHandler);
 }

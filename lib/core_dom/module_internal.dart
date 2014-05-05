@@ -62,7 +62,7 @@ class CoreDomModule extends Module {
     bind(TranscludingComponentFactory);
     bind(Content);
     bind(ContentPort, toValue: null);
-    
+
     bind(Http);
     bind(UrlRewriter);
     bind(HttpBackend);

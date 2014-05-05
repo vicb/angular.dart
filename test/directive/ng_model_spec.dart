@@ -1615,42 +1615,41 @@ class ControllerWithNoLove {
 
 class LowercaseValueParser implements NgModelConverter {
   final name = 'lowercase';
-  format(value) => value;
-  parse(value) {
+  String format(value) => value;
+  String parse(value) {
     return value != null ? value.toLowerCase() : null;
   }
 }
 
 class UppercaseValueFormatter implements NgModelConverter {
   final name = 'uppercase';
-  parse(value) => value;
-  format(value) {
+  String parse(value) => value;
+  String format(value) {
     return value != null ? value.toUpperCase() : null;
   }
 }
 
 class FailedValueParser implements NgModelConverter {
   final name = 'failed';
-  format(value) => value;
-  parse(value) {
+  String format(value) => value;
+  String parse(value) {
     throw new Exception();
   }
 }
 
 class VowelValueParser implements NgModelConverter {
   final name = 'vowel';
-  parse(value) => value;
-  format(value) {
+  String parse(value) => value;
+  String format(value) {
     if(value != null) {
-      var exp = new RegExp("[^aeiouAEIOU]");
+      var exp = new RegExp("[^aeiou]", caseSensitive: false);
       value = value.replaceAll(exp, "");
     }
     return value;
   }
 }
 
-@Decorator(
-    selector: '[custom-input-validation]')
+@Decorator(selector: '[custom-input-validation]')
 class MyCustomInputValidator extends NgValidator {
   MyCustomInputValidator(NgModel ngModel) {
     ngModel.addValidator(this);
@@ -1663,8 +1662,7 @@ class MyCustomInputValidator extends NgValidator {
   }
 }
 
-@Decorator(
-    selector: '[counting-validator]')
+@Decorator(selector: '[counting-validator]')
 class CountingValidator extends NgValidator {
 
   final String name = 'counting';

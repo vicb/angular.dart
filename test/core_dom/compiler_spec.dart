@@ -882,8 +882,7 @@ class SimpleComponent {
 @Component(
   selector: 'shadowy',
   template: r'With shadow DOM',
-  useShadowDom: true
-)
+  useShadowDom: true)
 class ShadowyComponent {
   ShadowyComponent(Logger log) {
     log('shadowy');
@@ -893,8 +892,7 @@ class ShadowyComponent {
 @Component(
     selector: 'shadowless',
     template: r'Without shadow DOM',
-    useShadowDom: false
-)
+    useShadowDom: false)
 class ShadowlessComponent {
   ShadowlessComponent(Logger log) {
     log('shadowless');
@@ -920,8 +918,7 @@ class SometimesComponent {
     })
 class IoComponent {
   Scope scope;
-  IoComponent(Scope scope) {
-    this.scope = scope;
+  IoComponent(this.scope) {
     scope.rootScope.context['ioComponent'] = this;
     scope.context['expr'] = 'initialExpr';
   }
@@ -945,8 +942,7 @@ class IoControllerComponent {
   var exprOnce;
   var onDone;
   var onOptional;
-  IoControllerComponent(Scope scope) {
-    this.scope = scope;
+  IoControllerComponent(this.scope) {
     scope.rootScope.context['ioComponent'] = this;
   }
 }
@@ -1058,9 +1054,11 @@ class AttachDetachComponent implements AttachAware, DetachAware, ShadowRootAware
     templateLoader.template.then((_) => logger('templateLoaded'));
   }
 
-  attach() => logger('attach:@$attrValue; =>$exprValue; =>!$onceValue');
-  detach() => logger('detach');
-  onShadowRoot(shadowRoot) {
+  void attach() => logger('attach:@$attrValue; =>$exprValue; =>!$onceValue');
+
+  void detach() => logger('detach');
+
+  void onShadowRoot(shadowRoot) {
     scope.rootScope.context['shadowRoot'] = shadowRoot;
     logger(shadowRoot);
   }
@@ -1083,9 +1081,7 @@ class InvalidSelector {}
 
 @Formatter(name:'hello')
 class SayHelloFormatter {
-  call(String str) {
-    return 'Hello, $str!';
-  }
+  String call(String str) => 'Hello, $str!';
 }
 
 @Component(
@@ -1115,8 +1111,8 @@ class SimpleAttachComponent implements AttachAware, ShadowRootAware {
   SimpleAttachComponent(this.logger) {
     logger('SimpleAttachComponent');
   }
-  attach() => logger('attach');
-  onShadowRoot(_) => logger('onShadowRoot');
+  void attach() => logger('attach');
+  void onShadowRoot(_) => logger('onShadowRoot');
 }
 
 @Component(
@@ -1124,7 +1120,7 @@ class SimpleAttachComponent implements AttachAware, ShadowRootAware {
     templateUrl: 'foo.html')
 class LogElementComponent{
   LogElementComponent(Logger logger, Element element, Node node,
-                        ShadowRoot shadowRoot) {
+                      ShadowRoot shadowRoot) {
     logger(element);
     logger(node);
     logger(shadowRoot);

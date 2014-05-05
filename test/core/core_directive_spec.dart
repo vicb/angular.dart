@@ -108,11 +108,11 @@ class NullParser implements Parser {
     module: AnnotatedIoComponent.module,
     visibility: Directive.LOCAL_VISIBILITY,
     exportExpressions: const ['exportExpressions'],
-    map: const {
-      'foo': '=>foo'
-    })
+    map: const {'foo': '=>foo'})
 class AnnotatedIoComponent {
-  static module() => new Module()..bind(String, toFactory: (i) => i.get(AnnotatedIoComponent),
+  static module() => new Module()..bind(
+      String,
+      toFactory: (i) => i.get(AnnotatedIoComponent),
       visibility: Directive.LOCAL_VISIBILITY);
 
   AnnotatedIoComponent(Scope scope) {
