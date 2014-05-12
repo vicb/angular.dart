@@ -84,46 +84,6 @@ class ScopeDigestTTL {
   ScopeDigestTTL.value(this.ttl);
 }
 
-//TODO(misko): I don't think this should be in scope.
-class ScopeLocals implements Map {
-  static wrapper(scope, Map<String, Object> locals) =>
-      new ScopeLocals(scope, locals);
-
-  Map _scope;
-  Map<String, Object> _locals;
-
-  ScopeLocals(this._scope, this._locals);
-
-  void operator []=(String name, value) {
-    _scope[name] = value;
-  }
-  dynamic operator [](String name) {
-    // Map needed to clear Dart2js warning
-    Map map = _locals.containsKey(name) ? _locals : _scope;
-    return map[name];
-  }
-
-  bool get isEmpty => _scope.isEmpty && _locals.isEmpty;
-  bool get isNotEmpty => _scope.isNotEmpty || _locals.isNotEmpty;
-  List<String> get keys => _scope.keys;
-  List get values => _scope.values;
-  int get length => _scope.length;
-
-  void forEach(fn) {
-    _scope.forEach(fn);
-  }
-  dynamic remove(key) => _scope.remove(key);
-  void clear() {
-    _scope.clear;
-  }
-  bool containsKey(key) => _scope.containsKey(key);
-  bool containsValue(key) => _scope.containsValue(key);
-  void addAll(map) {
-    _scope.addAll(map);
-  }
-  dynamic putIfAbsent(key, fn) => _scope.putIfAbsent(key, fn);
-}
-
 /**
  * [Scope] is represents a collection of [watch]es [observe]ers, and [context]
  * for the watchers, observers and [eval]uations. Scopes structure loosely
@@ -139,6 +99,9 @@ class Scope {
    * The default execution context for [watch]es [observe]ers, and [eval]uation.
    */
   final context;
+
+  bool hasLocal(name) => context is ContextLocals && (context as ContextLocals).hasProperty(name);
+  dynamic getLocal(name) => (context as ContextLocals)[name];
 
   /**
    * The [RootScope] of the application.
@@ -252,8 +215,8 @@ class Scope {
            expression is String ||
            expression is Function);
     if (expression is String && expression.isNotEmpty) {
-      var obj = locals == null ? context : new ScopeLocals(context, locals);
-      return rootScope._parser(expression).eval(obj);
+      var ctx = locals == null ? context : new ContextLocals(context, locals);
+      return rootScope._parser(expression).eval(ctx);
     }
 
     assert(locals == null);
@@ -1302,3 +1265,46 @@ class _FormatterWrapper extends FunctionApply {
     return value;
   }
 }
+
+class ClosureMapLocalsAware implements ClosureMap {
+  final ClosureMap wrappedClsMap;
+
+  ClosureMapLocalsAware(this.wrappedClsMap);
+
+  Getter lookupGetter(String name) {
+    var getter;
+    return (o) {
+      if (o is ContextLocals) {
+        var ctx = o as ContextLocals;
+        if (ctx.hasProperty(name)) return ctx[name];
+        o = ctx.rootContext;
+      }
+      if (getter == null) getter = wrappedClsMap.lookupGetter(name);
+      return getter(o);
+    };
+  }
+
+  Setter lookupSetter(String name) {
+    var setter = wrappedClsMap.lookupSetter(name);
+    return (o, value) {
+      return o is ContextLocals ?
+          setter(o.rootContext, value) :
+          setter(o, value);
+    };
+  }
+
+  MethodClosure lookupFunction(String name, CallArguments arguments) {
+    var fn = wrappedClsMap.lookupFunction(name, arguments);
+    return (o, pArgs, nArgs) {
+      if (o is ContextLocals) {
+        var ctx = o as ContextLocals;
+        if (ctx.hasProperty(name)) return fn({name: ctx[name]}, pArgs, nArgs);
+        o = ctx.rootContext;
+      }
+      return fn(o, pArgs, nArgs);
+    };
+  }
+
+  Symbol lookupSymbol(String name) => wrappedClsMap.lookupSymbol(name);
+}
+

@@ -46,10 +46,7 @@ void main() {
           ..bind(IncludeTranscludeAttrDirective)
           ..bind(LocalAttrDirective)
           ..bind(OneOfTwoDirectives)
-          ..bind(TwoOfTwoDirectives)
-          ..bind(MyController)
-          ..bind(MyParentController)
-          ..bind(MyChildController);
+          ..bind(TwoOfTwoDirectives);
     });
 
     beforeEach(inject((TestBed tb) => _ = tb));
@@ -261,7 +258,6 @@ void main() {
           ..bind(NonAssignableMappingComponent)
           ..bind(ParentExpressionComponent)
           ..bind(PublishMeComponent)
-          ..bind(PublishMeDirective)
           ..bind(LogComponent)
           ..bind(AttachDetachComponent)
           ..bind(SimpleAttachComponent)
@@ -539,14 +535,6 @@ void main() {
         expect(element).toHaveText('WORKED');
       }));
 
-      it('should publish directive controller into the scope', async((VmTurnZone zone) {
-        var element = _.compile(r'<div><div publish-me>{{ctrlName.value}}</div></div>');
-
-        microLeap();
-        _.rootScope.apply();
-        expect(element.text).toEqual('WORKED');
-      }));
-
       it('should "publish" controller to injector under provided module', () {
         _.compile(r'<div publish-types></div>');
         expect(PublishModuleAttrDirective._injector.get(PublishModuleAttrDirective)).
@@ -692,85 +680,8 @@ void main() {
       });
     });
 
-
-    describe('controller scoping', () {
-      it('should make controllers available to sibling and child controllers', async((Logger log) {
-        _.compile('<tab local><pane local></pane><pane local></pane></tab>');
-        microLeap();
-
-        expect(log.result()).toEqual('TabComponent-0; LocalAttrDirective-0; PaneComponent-1; LocalAttrDirective-0; PaneComponent-2; LocalAttrDirective-0');
-      }));
-
-      it('should use the correct parent injector', async((Logger log) {
-        // Getting the parent offsets correct while descending the template is tricky.  If we get it wrong, this
-        // test case will create too many TabComponents.
-
-        _.compile('<div ng-bind="true"><div ignore-children></div><tab local><pane local></pane></tab>');
-        microLeap();
-
-        expect(log.result()).toEqual('Ignore; TabComponent-0; LocalAttrDirective-0; PaneComponent-1; LocalAttrDirective-0');
-      }));
-
-      it('should reuse controllers for transclusions', async((Logger log) {
-        _.compile('<div simple-transclude-in-attach include-transclude>view</div>');
-        microLeap();
-
-        _.rootScope.apply();
-        expect(log.result()).toEqual('IncludeTransclude; SimpleTransclude');
-      }));
-
-      it('should expose a parent controller to the scope of its children', (TestBed _) {
-        var element = _.compile('<div my-parent-controller>'
-            '  <div my-child-controller>{{ my_parent.data() }}</div>'
-            '</div>');
-
-        _.rootScope.apply();
-
-        expect(element.text).toContain('my data');
-      });
-
-      it('should expose a ancestor controller to the scope of its children thru a undecorated element', (TestBed _) {
-        var element = _.compile(
-            '<div my-parent-controller>'
-              '<div>'
-                '<div my-child-controller>{{ my_parent.data() }}</div>'
-              '</div>'
-            '</div>');
-
-        _.rootScope.apply();
-
-        expect(element.text).toContain('my data');
-      });
-    });
-
-
-    describe('Decorator', () {
-      it('should allow creation of a new scope', () {
-        _.rootScope.context['name'] = 'cover me';
-        _.compile('<div><div my-controller>{{name}}</div></div>');
-        _.rootScope.apply();
-        expect(_.rootScope.context['name']).toEqual('cover me');
-        expect(_.rootElement.text).toEqual('MyController');
-      });
-    });
-
   }));
 }
-
-
-@Controller(
-  selector: '[my-parent-controller]',
-  publishAs: 'my_parent')
-class MyParentController {
-  data() {
-    return "my data";
-  }
-}
-
-@Controller(
-  selector: '[my-child-controller]',
-  publishAs: 'my_child')
-class MyChildController {}
 
 @Component(
     selector: 'tab',
@@ -901,13 +812,13 @@ class ShadowlessComponent {
 
 @Component(
   selector: 'sometimes',
-  template: r'<div ng-if="ctrl.sometimes"><content></content></div>',
-  publishAs: 'ctrl')
+  template: r'<div ng-if="sometimes"><content></content></div>')
 class SometimesComponent {
   @NgTwoWay('sometimes')
   var sometimes;
 }
 
+// todo(vicb)
 @Component(
     selector: 'io',
     template: r'<content></content>',
@@ -927,7 +838,6 @@ class IoComponent {
 @Component(
     selector: 'io-controller',
     template: r'<content></content>',
-    publishAs: 'ctrl',
     map: const {
         'attr': '@attr',
         'expr': '<=>expr',
@@ -1006,24 +916,14 @@ class ParentExpressionComponent {
 
 @Component(
     selector: 'publish-me',
-    template: r'{{ctrlName.value}}',
-    publishAs: 'ctrlName')
+    template: r'{{ctrlName.value}}')
 class PublishMeComponent {
   String value = 'WORKED';
 }
 
-@Controller (
-    selector: '[publish-me]',
-    publishAs: 'ctrlName')
-class PublishMeDirective {
-  String value = 'WORKED';
-}
-
-
 @Component(
     selector: 'log',
-    template: r'<content></content>',
-    publishAs: 'ctrlName')
+    template: r'<content></content>')
 class LogComponent {
   LogComponent(Scope scope, Logger logger) {
     logger(scope);
@@ -1064,9 +964,7 @@ class AttachDetachComponent implements AttachAware, DetachAware, ShadowRootAware
   }
 }
 
-@Controller(
-    selector: '[my-controller]',
-    publishAs: 'myCtrl')
+//@Controller(selector: '[my-controller]')
 class MyController {
   MyController(Scope scope) {
     scope.context['name'] = 'MyController';
@@ -1087,7 +985,6 @@ class SayHelloFormatter {
 @Component(
     selector: 'expr-attr-component',
     template: r'<content></content>',
-    publishAs: 'ctrl',
     map: const {
         'expr': '<=>expr',
         'one-way': '=>oneWay',

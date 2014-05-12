@@ -64,7 +64,7 @@ void main() {
     }
 
     beforeEach(inject((Logger _logger) {
-      context = {};
+      context = new ContextLocals({});
       var getterFactory = new DynamicFieldGetterFactory();
       changeDetector = new DirtyCheckingChangeDetector(getterFactory);
       watchGrp = new RootWatchGroup(getterFactory, changeDetector, context);
@@ -817,10 +817,11 @@ void main() {
 
     describe('child group', () {
       it('should remove all field watches in group and group\'s children', () {
+        context['a'] = null;
         watchGrp.watch(parse('a'), (v, p) => logger('0a'));
-        var child1a = watchGrp.newGroup(new PrototypeMap(context));
-        var child1b = watchGrp.newGroup(new PrototypeMap(context));
-        var child2 = child1a.newGroup(new PrototypeMap(context));
+        var child1a = watchGrp.newGroup(new ContextLocals(context));
+        var child1b = watchGrp.newGroup(new ContextLocals(context));
+        var child2 = child1a.newGroup(new ContextLocals(context));
         child1a.watch(parse('a'), (v, p) => logger('1a'));
         child1b.watch(parse('a'), (v, p) => logger('1b'));
         watchGrp.watch(parse('a'), (v, p) => logger('0A'));
@@ -854,10 +855,10 @@ void main() {
         watchGrp.watch(countMethod, (v, p) => logger('0a'));
         expectOrder(['0a']);
 
-        var child1a = watchGrp.newGroup(new PrototypeMap(context));
-        var child1b = watchGrp.newGroup(new PrototypeMap(context));
-        var child2 = child1a.newGroup(new PrototypeMap(context));
-        var child3 = child2.newGroup(new PrototypeMap(context));
+        var child1a = watchGrp.newGroup(new ContextLocals(context));
+        var child1b = watchGrp.newGroup(new ContextLocals(context));
+        var child2 = child1a.newGroup(new ContextLocals(context));
+        var child3 = child2.newGroup(new ContextLocals(context));
         child1a.watch(countMethod, (v, p) => logger('1a'));
         expectOrder(['0a', '1a']);
         child1b.watch(countMethod, (v, p) => logger('1b'));
@@ -884,7 +885,7 @@ void main() {
         context['my'] = new MyClass(logger);
         AST countMethod = new MethodAST(parse('my'), 'count', []);
         var ra = watchGrp.watch(countMethod, (v, p) => logger('a'));
-        var child = watchGrp.newGroup(new PrototypeMap(context));
+        var child = watchGrp.newGroup(new ContextLocals(context));
         var cb = child.watch(countMethod, (v, p) => logger('b'));
 
         expectOrder(['a', 'b']);
@@ -926,7 +927,7 @@ void main() {
 
 
       it('should watch children', () {
-        var childContext = new PrototypeMap(context);
+        var childContext = new ContextLocals(context);
         context['a'] = 'OK';
         context['b'] = 'BAD';
         childContext['b'] = 'OK';

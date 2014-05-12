@@ -449,7 +449,7 @@ main() {
     it('should correctly handle detached state', () {
       scope.context['items'] = [1];
 
-      var parentScope = scope.createChild(new PrototypeMap(scope.context));
+      var parentScope = scope.createChild(new ContextLocals(scope.context));
       element = compile(
         '<ul>'
           '<li ng-repeat="item in items">{{item}}</li>'

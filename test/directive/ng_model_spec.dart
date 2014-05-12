@@ -1363,7 +1363,7 @@ void main() {
     describe('error messages', () {
       it('should produce a useful error for bad ng-model expressions', () {
         expect(async(() {
-          _.compile('<div no-love><textarea ng-model=ctrl.love probe="loveProbe"></textarea></div');
+          _.compile('<div no-love><textarea ng-model="love" probe="loveProbe"></textarea></div');
           Probe probe = _.rootScope.context['loveProbe'];
           TextAreaElement inputElement = probe.element;
 
@@ -1606,9 +1606,7 @@ void main() {
   });
 }
 
-@Controller(
-    selector: '[no-love]',
-    publishAs: 'ctrl')
+//@Controller(selector: '[no-love]')
 class ControllerWithNoLove {
   var apathy = null;
 }

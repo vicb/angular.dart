@@ -776,22 +776,24 @@ class _EvalWatchRecord implements WatchRecord<_Handler> {
 
   dynamic get object => _object;
 
-  set object(value) {
+  void set object(object) {
     assert(mode != _MODE_DELETED_);
     assert(mode != _MODE_MARKER_);
     assert(mode != _MODE_FUNCTION_);
     assert(mode != _MODE_PURE_FUNCTION_);
     assert(mode != _MODE_PURE_FUNCTION_APPLY_);
-    _object = value;
+    _object = object;
 
-    if (value == null) {
+    if (object == null) {
       mode = _MODE_NULL_;
     } else {
-      if (value is Map) {
-        mode =  _MODE_MAP_CLOSURE_;
+      if (object is Map ||
+          object is ContextLocals && (object as ContextLocals).hasProperty(name)) {
+        mode = _MODE_MAP_CLOSURE_;
       } else {
+        if (object is ContextLocals) object = (object as ContextLocals).rootContext;
         mode = _MODE_FIELD_OR_METHOD_CLOSURE_;
-        fn = _fieldGetterFactory.getter(value, name);
+        fn = _fieldGetterFactory.getter(object, name);
       }
     }
   }
