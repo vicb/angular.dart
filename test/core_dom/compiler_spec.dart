@@ -3,7 +3,7 @@ library compiler_spec;
 import '../_specs.dart';
 
 
-forBothCompilers(fn) {
+forCompilers(fn) {
   describe('walking compiler', () {
     beforeEachModule((Module m) {
       m.bind(Compiler, toImplementation: WalkingCompiler);
@@ -32,7 +32,7 @@ forBothCompilers(fn) {
 }
 
 void main() {
-  forBothCompilers(() =>
+  forCompilers(() =>
   describe('dte.compiler', () {
     TestBed _;
 
@@ -213,14 +213,13 @@ void main() {
         microLeap();
         _.rootScope.apply();
         var component = _.rootScope.context['ioComponent'];
-        expect(component.scope.context['name']).toEqual(null);
-        expect(component.scope.context['attr']).toEqual('A');
-        expect(component.scope.context['expr']).toEqual('misko');
-        component.scope.context['expr'] = 'angular';
+        expect(component.attr).toEqual('A');
+        expect(component.expr).toEqual('misko');
+        component.expr = 'angular';
         _.rootScope.apply();
         expect(_.rootScope.context['name']).toEqual('angular');
         expect(_.rootScope.context['done']).toEqual(null);
-        component.scope.context['ondone']();
+        component.ondone();
         expect(_.rootScope.context['done']).toEqual(true);
       }));
     });
@@ -323,7 +322,7 @@ void main() {
         expect(simpleElement).toHaveText('INNER(innerText)');
         var simpleProbe = ngProbe(simpleElement);
         var simpleComponent = simpleProbe.injector.get(SimpleComponent);
-        expect(simpleComponent.scope.context['name']).toEqual('INNER');
+        expect(simpleComponent.name).toEqual('INNER');
         var shadowRoot = simpleElement.shadowRoot;
 
         // If there is no shadow root, skip this.
@@ -343,6 +342,7 @@ void main() {
         expect(element).toHaveText('OUTTER:INNER(OUTTER)');
       }));
 
+      // todo(vicb) - parent
       it('should create a component that can access parent scope', async((VmTurnZone zone) {
         _.rootScope.context['fromParent'] = "should not be used";
         _.rootScope.context['val'] = "poof";
@@ -353,6 +353,7 @@ void main() {
         expect(element).toHaveText('inside poof');
       }));
 
+      // todo(vicb) - parent
       it('should behave nicely if a mapped attribute is missing', async((VmTurnZone zone) {
         var element = _.compile('<parent-expression></parent-expression>');
 
@@ -361,6 +362,7 @@ void main() {
         expect(element).toHaveText('inside ');
       }));
 
+      // todo(vicb) - parent
       it('should behave nicely if a mapped attribute evals to null', async((VmTurnZone zone) {
         _.rootScope.context['val'] = null;
         var element = _.compile('<parent-expression fromParent=val></parent-expression>');
@@ -408,8 +410,8 @@ void main() {
 
         var component = _.rootScope.context['ioComponent'];
         _.rootScope.apply();
-        expect(component.scope.context['expr']).toEqual('misko');
-        component.scope.context['expr'] = 'angular';
+        expect(component.expr).toEqual('misko');
+        component.expr = 'angular';
         _.rootScope.apply();
         expect(_.rootScope.context['name']).toEqual('angular');
       }));
@@ -512,8 +514,8 @@ void main() {
         _.compile('<camel-case-map camel-case=G></camel-case-map>');
         microLeap();
         _.rootScope.apply();
-        var componentScope = _.rootScope.context['camelCase'];
-        expect(componentScope.context['camelCase']).toEqual('G');
+        var componentContext = _.rootScope.context['camelCase'];
+        expect(componentContext.camelCase).toEqual('G');
       }));
 
       // TODO: This is a terrible test
@@ -688,9 +690,7 @@ void main() {
     visibility: Directive.DIRECT_CHILDREN_VISIBILITY)
 class TabComponent {
   int id = 0;
-  Logger log;
-  LocalAttrDirective local;
-  TabComponent(Logger this.log, LocalAttrDirective this.local, Scope scope) {
+  TabComponent(Logger log, LocalAttrDirective local) {
     log('TabComponent-${id++}');
     local.ping();
   }
@@ -698,10 +698,7 @@ class TabComponent {
 
 @Component(selector: 'pane')
 class PaneComponent {
-  TabComponent tabComponent;
-  LocalAttrDirective localDirective;
-  Logger log;
-  PaneComponent(TabComponent this.tabComponent, LocalAttrDirective this.localDirective, Logger this.log, Scope scope) {
+  PaneComponent(TabComponent tabComponent, LocalAttrDirective localDirective, Logger log) {
     log('PaneComponent-${tabComponent.id++}');
     localDirective.ping();
   }
@@ -784,10 +781,7 @@ class PublishModuleAttrDirective implements PublishModuleDirectiveSuperType {
     selector: 'simple',
     template: r'{{name}}(<content>SHADOW-CONTENT</content>)')
 class SimpleComponent {
-  Scope scope;
-  SimpleComponent(Scope this.scope) {
-    scope.context['name'] = 'INNER';
-  }
+  var name = 'INNER';
 }
 
 @Component(
@@ -823,15 +817,18 @@ class SometimesComponent {
     selector: 'io',
     template: r'<content></content>',
     map: const {
-        'attr': '@scope.context.attr',
-        'expr': '<=>scope.context.expr',
-        'ondone': '&scope.context.ondone',
+        'attr': '@attr',
+        'expr': '<=>expr',
+        'ondone': '&ondone',
     })
 class IoComponent {
-  Scope scope;
-  IoComponent(this.scope) {
-    scope.rootScope.context['ioComponent'] = this;
-    scope.context['expr'] = 'initialExpr';
+  var attr;
+  var expr = 'initialExpr';
+  Function ondone;
+  var done;
+
+  IoComponent(RootScope rootScope) {
+    rootScope.context['ioComponent'] = this;
   }
 }
 
@@ -846,14 +843,13 @@ class IoComponent {
         'on-optional': '&onOptional'
     })
 class IoControllerComponent {
-  Scope scope;
   var attr;
   var expr;
   var exprOnce;
   var onDone;
   var onOptional;
-  IoControllerComponent(this.scope) {
-    scope.rootScope.context['ioComponent'] = this;
+  IoControllerComponent(RootScope rootScope) {
+    rootScope.context['ioComponent'] = this;
   }
 }
 
@@ -867,15 +863,13 @@ class IoControllerComponent {
         'onOptional': '&onOptional'
     })
 class UnpublishedIoControllerComponent {
-  Scope scope;
   var attr;
   var expr;
   var exprOnce;
   var onDone;
   var onOptional;
-  UnpublishedIoControllerComponent(Scope scope) {
-    this.scope = scope;
-    scope.rootScope.context['ioComponent'] = this;
+  UnpublishedIoControllerComponent(RootScope rootScope) {
+    rootScope.context['ioComponent'] = this;
   }
 }
 
@@ -894,12 +888,13 @@ class NonAssignableMappingComponent { }
 @Component(
     selector: 'camel-case-map',
     map: const {
-      'camel-case': '@scope.context.camelCase',
+      'camel-case': '@camelCase',
     })
 class CamelCaseMapComponent {
-  Scope scope;
-  CamelCaseMapComponent(Scope this.scope) {
-    scope.rootScope.context['camelCase'] = scope;
+  var camelCase;
+
+  CamelCaseMapComponent(RootScope rootScope) {
+    rootScope.context['camelCase'] = this;
   }
 }
 
@@ -916,7 +911,7 @@ class ParentExpressionComponent {
 
 @Component(
     selector: 'publish-me',
-    template: r'{{ctrlName.value}}')
+    template: r'{{value}}')
 class PublishMeComponent {
   String value = 'WORKED';
 }
@@ -925,8 +920,8 @@ class PublishMeComponent {
     selector: 'log',
     template: r'<content></content>')
 class LogComponent {
-  LogComponent(Scope scope, Logger logger) {
-    logger(scope);
+  LogComponent(Logger logger) {
+    logger("LogComponent");
   }
 }
 
@@ -943,13 +938,13 @@ class LogComponent {
     })
 class AttachDetachComponent implements AttachAware, DetachAware, ShadowRootAware {
   Logger logger;
-  Scope scope;
+  RootScope rootScope;
   String attrValue = 'too early';
   String exprValue = 'too early';
   String onceValue = 'too early';
   String optional;
 
-  AttachDetachComponent(Logger this.logger, TemplateLoader templateLoader, Scope this.scope) {
+  AttachDetachComponent(this.logger, this.rootScope, TemplateLoader templateLoader) {
     logger('new');
     templateLoader.template.then((_) => logger('templateLoaded'));
   }
@@ -959,15 +954,8 @@ class AttachDetachComponent implements AttachAware, DetachAware, ShadowRootAware
   void detach() => logger('detach');
 
   void onShadowRoot(shadowRoot) {
-    scope.rootScope.context['shadowRoot'] = shadowRoot;
+    rootScope.context['shadowRoot'] = shadowRoot;
     logger(shadowRoot);
-  }
-}
-
-//@Controller(selector: '[my-controller]')
-class MyController {
-  MyController(Scope scope) {
-    scope.context['name'] = 'MyController';
   }
 }
 
@@ -995,8 +983,8 @@ class ExprAttrComponent {
   var oneWay;
   var exprOnce;
 
-  ExprAttrComponent(Scope scope) {
-    scope.rootScope.context['exprAttrComponent'] = this;
+  ExprAttrComponent(RootScope rootScope) {
+    rootScope.context['exprAttrComponent'] = this;
   }
 }
 
