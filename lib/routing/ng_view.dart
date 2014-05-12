@@ -154,7 +154,7 @@ class NgView implements DetachAware, RouteProvider {
 
 
 /**
- * Class that can be injected to retrieve information about the current route.
+ * Inject a [RouteProvider] to retrieve information about the current route.
  * For example:
  *
  *     @Component(/* ... */)
@@ -173,7 +173,7 @@ class NgView implements DetachAware, RouteProvider {
  *         });
  *       }
  *
- *       detach() {
+ *       void detach() {
  *         // The route handle must be discarded.
  *         route.discard();
  *       }
@@ -183,8 +183,8 @@ class NgView implements DetachAware, RouteProvider {
  *       }
  *     }
  *
- * If user component is used outside of ng-view directive then
- * injected [RouteProvider] will be null.
+ * If user component is used outside of ng-view directive then the injected [RouteProvider] will be
+ * null.
  */
 abstract class RouteProvider {
 

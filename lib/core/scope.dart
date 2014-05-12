@@ -184,7 +184,7 @@ class Scope {
   /// Do not use. Exposes internal state for testing.
   bool get hasOwnStreams => _streams != null  && _streams._scope == this;
 
-  Scope(Object this.context, this.rootScope, this._parentScope,
+  Scope(this.context, this.rootScope, this._parentScope,
         this._readWriteGroup, this._readOnlyGroup, this.id,
         this._stats);
 
@@ -212,7 +212,7 @@ class Scope {
    *   by reference. When watching a collection, the reaction function receives a
    *   [CollectionChangeItem] that lists all the changes.
    */
-  Watch watch(String expression, ReactionFn reactionFn,  {context,
+  Watch watch(String expression, ReactionFn reactionFn, {context,
       FormatterMap formatters, bool canChangeModel: true, bool collection: false}) {
     assert(isAttached);
     assert(expression is String);
@@ -329,7 +329,7 @@ class Scope {
     _parentScope = null;
   }
 
-  _assertInternalStateConsistency() {
+  void _assertInternalStateConsistency() {
     assert((() {
       rootScope._verifyStreams(null, '', []);
       return true;
@@ -366,7 +366,7 @@ class Scope {
   }
 }
 
-_mapEqual(Map a, Map b) => a.length == b.length &&
+bool _mapEqual(Map a, Map b) => a.length == b.length &&
     a.keys.every((k) => b.containsKey(k) && a[k] == b[k]);
 
 /**
@@ -382,11 +382,11 @@ class ScopeStats {
   final evalStopwatch = new AvgStopwatch();
   final processStopwatch = new AvgStopwatch();
 
-  List<int> _digestLoopTimes = [];
+  final _digestLoopTimes = <int>[];
   int _flushPhaseDuration = 0 ;
   int _assertFlushPhaseDuration = 0;
 
-  int _loopNo = 0;
+  int _loopNo;
   ScopeStatsEmitter _emitter;
   ScopeStatsConfig _config;
 
@@ -396,7 +396,7 @@ class ScopeStats {
   ScopeStats(this._emitter, this._config);
 
   void digestStart() {
-    _digestLoopTimes = [];
+    _digestLoopTimes.clear();
     _stopwatchReset();
     _loopNo = 0;
   }
@@ -407,7 +407,7 @@ class ScopeStats {
       processStopwatch.elapsedMicroseconds;
   }
 
-  _stopwatchReset() {
+  void _stopwatchReset() {
     fieldStopwatch.reset();
     evalStopwatch.reset();
     processStopwatch.reset();
@@ -416,10 +416,9 @@ class ScopeStats {
   void digestLoop(int changeCount) {
     _loopNo++;
     if (_config.emit && _emitter != null) {
-      _emitter.emit(_loopNo.toString(), fieldStopwatch, evalStopwatch,
-        processStopwatch);
+      _emitter.emit(_loopNo.toString(), fieldStopwatch, evalStopwatch, processStopwatch);
     }
-    _digestLoopTimes.add( _allStagesDuration() );
+    _digestLoopTimes.add(_allStagesDuration());
     _stopwatchReset();
   }
 
@@ -430,23 +429,25 @@ class ScopeStats {
   void domWriteEnd() {}
   void domReadStart() {}
   void domReadEnd() {}
+
   void flushStart() {
     _stopwatchReset();
   }
+
   void flushEnd() {
     if (_config.emit && _emitter != null) {
-      _emitter.emit(RootScope.STATE_FLUSH, fieldStopwatch, evalStopwatch,
-        processStopwatch);
+      _emitter.emit(RootScope.STATE_FLUSH, fieldStopwatch, evalStopwatch, processStopwatch);
     }
     _flushPhaseDuration = _allStagesDuration();
   }
+
   void flushAssertStart() {
     _stopwatchReset();
   }
+
   void flushAssertEnd() {
     if (_config.emit && _emitter != null) {
-      _emitter.emit(RootScope.STATE_FLUSH_ASSERT, fieldStopwatch, evalStopwatch,
-        processStopwatch);
+      _emitter.emit(RootScope.STATE_FLUSH_ASSERT, fieldStopwatch, evalStopwatch, processStopwatch);
     }
     _assertFlushPhaseDuration = _allStagesDuration();
   }
@@ -472,9 +473,9 @@ class ScopeStatsEmitter {
 
   static pad(String str, int size) => _PAD_.substring(0, max(size - str.length, 0)) + str;
 
-  _ms(num value) => '${pad(_nfDec.format(value), 9)} ms';
-  _us(num value) => _ms(value / 1000);
-  _tally(num value) => '${pad(_nfInt.format(value), 6)}';
+  String _ms(num value) => '${pad(_nfDec.format(value), 9)} ms';
+  String _us(num value) => _ms(value / 1000);
+  String _tally(num value) => '${pad(_nfInt.format(value), 6)}';
 
   /**
    * Emit a message based on the phase and state of stopwatches.
@@ -498,9 +499,8 @@ class ScopeStatsEmitter {
     return (prefix == '1' ? _HEADER_ : '')  + '     #$prefix:';
   }
 
-  String _stat(AvgStopwatch s) {
-    return '${_tally(s.count)} / ${_us(s.elapsedMicroseconds)} @(${_tally(s.ratePerMs)} #/ms)';
-  }
+  String _stat(AvgStopwatch s) =>
+      '${_tally(s.count)} / ${_us(s.elapsedMicroseconds)} @(${_tally(s.ratePerMs)} #/ms)';
 }
 
 /**
@@ -511,6 +511,7 @@ class ScopeStatsConfig {
   var emit = false;
 
   ScopeStatsConfig();
+
   ScopeStatsConfig.enabled() {
     emit = true;
   }
@@ -576,8 +577,8 @@ class RootScope extends Scope {
    * followed by change detection
    * on non-DOM listeners. Any changes detected are process using the reaction function. The digest
    * phase is repeated as long as at least one change has been detected. By default, after 5
-   * iterations the model is considered unstable and angular exists with an exception. (See
-   * ScopeDigestTTL)
+   * iterations the model is considered unstable and angular exits with an exception. (See
+   * [ScopeDigestTTL])
    *
    * ##flush
    *
@@ -1074,7 +1075,6 @@ class ExpressionVisitor implements syntax.Visitor {
   final ClosureMap _closureMap;
   AST contextRef = scopeContextRef;
 
-
   ExpressionVisitor(this._closureMap);
 
   AST ast;
@@ -1093,8 +1093,7 @@ class ExpressionVisitor implements syntax.Visitor {
   AST visitCollection(syntax.Expression exp) => new CollectionAST(visit(exp));
   AST _mapToAst(syntax.Expression expression) => visit(expression);
 
-  List<AST> _toAst(List<syntax.Expression> expressions) =>
-      expressions.map(_mapToAst).toList();
+  List<AST> _toAst(List<syntax.Expression> expressions) => expressions.map(_mapToAst).toList();
 
   Map<Symbol, AST> _toAstMap(Map<String, syntax.Expression> expressions) {
     if (expressions.isEmpty) return const {};
@@ -1115,37 +1114,47 @@ class ExpressionVisitor implements syntax.Visitor {
     Map<Symbol, AST> named = _toAstMap(exp.arguments.named);
     ast = new MethodAST(visit(exp.object), exp.name, positionals, named);
   }
+
   void visitAccessScope(syntax.AccessScope exp) {
     ast = new FieldReadAST(contextRef, exp.name);
   }
+
   void visitAccessMember(syntax.AccessMember exp) {
     ast = new FieldReadAST(visit(exp.object), exp.name);
   }
+
   void visitBinary(syntax.Binary exp) {
     ast = new PureFunctionAST(exp.operation,
                               _operationToFunction(exp.operation),
                               [visit(exp.left), visit(exp.right)]);
   }
+
+
   void visitPrefix(syntax.Prefix exp) {
     ast = new PureFunctionAST(exp.operation,
                               _operationToFunction(exp.operation),
                               [visit(exp.expression)]);
   }
+
   void visitConditional(syntax.Conditional exp) {
     ast = new PureFunctionAST('?:', _operation_ternary,
                               [visit(exp.condition), visit(exp.yes),
                               visit(exp.no)]);
   }
+
   void visitAccessKeyed(syntax.AccessKeyed exp) {
     ast = new ClosureAST('[]', _operation_bracket,
                              [visit(exp.object), visit(exp.key)]);
   }
+
   void visitLiteralPrimitive(syntax.LiteralPrimitive exp) {
     ast = new ConstantAST(exp.value);
   }
+
   void visitLiteralString(syntax.LiteralString exp) {
     ast = new ConstantAST(exp.value);
   }
+
   void visitLiteralArray(syntax.LiteralArray exp) {
     List<AST> items = _toAst(exp.elements);
     ast = new PureFunctionAST('[${items.join(', ')}]', new ArrayFn(), items);
@@ -1177,15 +1186,19 @@ class ExpressionVisitor implements syntax.Visitor {
   void visitCallFunction(syntax.CallFunction exp) {
     _notSupported("function's returing functions");
   }
+
   void visitAssign(syntax.Assign exp) {
     _notSupported('assignement');
   }
+
   void visitLiteral(syntax.Literal exp) {
     _notSupported('literal');
   }
+
   void visitExpression(syntax.Expression exp) {
     _notSupported('?');
   }
+
   void visitChain(syntax.Chain exp) {
     _notSupported(';');
   }

@@ -1,19 +1,19 @@
 part of angular.directive;
 
 /**
- * The ngSwitch directive is used to conditionally swap DOM structure on your
- * template based on a scope expression. Elements within ngSwitch but without
- * ngSwitchWhen or ngSwitchDefault directives will be preserved at the location
+ * The [ngSwitch] directive is used to conditionally swap DOM structure on your
+ * template based on a scope expression. Elements within [ngSwitch] but without
+ * [ngSwitchWhen] or [ngSwitchDefault] directives will be preserved at the location
  * as specified in the template.
  *
- * The directive itself works similar to ngInclude, however, instead of
- * downloading template code (or loading it from the template cache), ngSwitch
- * simply choses one of the nested elements and makes it visible based on which
+ * The directive itself works similar to [ngInclude], however, instead of
+ * downloading template code (or loading it from the template cache), [ngSwitch]
+ * simply chooses one of the nested elements and makes it visible based on which
  * element matches the value obtained from the evaluated expression. In other
  * words, you define a container element (where you place the directive), place
  * an expression on the **ng-switch="..." attribute**, define any inner elements
  * inside of the directive and place a when attribute per element. The when
- * attribute is used to inform ngSwitch which element to display when the on
+ * attribute is used to inform [ngSwitch] which element to display when the on
  * expression is evaluated. If a matching expression is not found via a when
  * attribute then an element with the default attribute is displayed.
  *

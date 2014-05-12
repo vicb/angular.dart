@@ -532,8 +532,6 @@ class DirtyCheckingRecord<H> implements Record<H>, WatchRecord<H> {
   String toString() => '${_MODE_NAMES[_mode]}[$field]{$hashCode}';
 }
 
-final Object _INITIAL_ = new Object();
-
 class _MapChangeRecord<K, V> implements MapChangeRecord<K, V> {
   final _records = new Map<dynamic, KeyValueRecord>();
   Map _map;
