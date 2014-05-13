@@ -12,7 +12,7 @@ class Content implements AttachAware, DetachAware {
     if (_port == null) return;
     _beginComment = _port.content(_element);
   }
-  
+
   void detach() {
     if (_port == null) return;
     _port.detachContent(_beginComment);
@@ -98,8 +98,7 @@ class BoundTranscludingComponentFactory implements BoundComponentFactory {
 
   FactoryFn call(dom.Node node) {
     // CSS is not supported.
-    assert(_component.cssUrls == null ||
-           _component.cssUrls.isEmpty);
+    assert(_component.cssUrls == null || _component.cssUrls.isEmpty);
 
     var element = node as dom.Element;
     return (Injector injector) {
@@ -107,7 +106,6 @@ class BoundTranscludingComponentFactory implements BoundComponentFactory {
       var childInjector;
       var childInjectorCompleter; // Used if the ViewFuture is available before the childInjector.
 
-      var component = _component;
       Scope scope = injector.getByKey(SCOPE_KEY);
       ViewCache viewCache = injector.getByKey(VIEW_CACHE_KEY);
       Http http = injector.getByKey(HTTP_KEY);
@@ -139,29 +137,26 @@ class BoundTranscludingComponentFactory implements BoundComponentFactory {
       }
       TemplateLoader templateLoader = new TemplateLoader(elementFuture);
 
-      Scope shadowScope = scope.createChild({});
-
       var probe;
       var childModule = new Module()
           ..bind(_ref.type)
           ..bind(NgElement)
           ..bind(ContentPort, toValue: contentPort)
-          ..bind(Scope, toValue: shadowScope)
+          ..bind(Scope, toFactory: (Injector inj) => scope.createChild(inj.get(_ref.type)))
           ..bind(TemplateLoader, toValue: templateLoader)
           ..bind(dom.ShadowRoot, toValue: new ShadowlessShadowRoot(element));
 
-      if (_f.config.elementProbeEnabled) {
-       childModule.bind(ElementProbe, toFactory: (_) => probe);
-      }
-      childInjector = injector.createChild([childModule], name: SHADOW_DOM_INJECTOR_NAME);
-      if (childInjectorCompleter != null) {
-        childInjectorCompleter.complete(childInjector);
-      }
+      if (_f.config.elementProbeEnabled) childModule.bind(ElementProbe, toFactory: (_) => probe);
 
-      var controller = childInjector.getByKey(_ref.typeKey);
-      shadowScope.context[component.publishAs] = controller;
-      BoundComponentFactory._setupOnShadowDomAttach(controller, templateLoader, shadowScope);
-      return controller;
+      childInjector = injector.createChild([childModule], name: SHADOW_DOM_INJECTOR_NAME);
+
+      if (childInjectorCompleter != null) childInjectorCompleter.complete(childInjector);
+
+      var component = childInjector.getByKey(_ref.typeKey);
+      var shadowScope = childInjector.get(Scope);
+      BoundComponentFactory._setupOnShadowDomAttach(component, templateLoader, shadowScope);
+
+      return component;
     };
   }
 }

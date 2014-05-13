@@ -112,7 +112,7 @@ class ElementBinder {
   }
 
   void _bindCallback(dstPathFn, controller, expression, scope) {
-    dstPathFn.assign(controller, _parser(expression).bind(scope.context, ScopeLocals.wrapper));
+    dstPathFn.assign(controller, _parser(expression).bind(scope.context, ContextLocals.wrapper));
   }
 
 
@@ -203,10 +203,6 @@ class ElementBinder {
         probe.directives.add(directive);
       }
 
-      if (ref.annotation is Controller) {
-        scope.context[(ref.annotation as Controller).publishAs] = directive;
-      }
-
       var tasks = directive is AttachAware ? new _TaskList(() {
         if (scope.isAttached) directive.attach();
       }) : null;
@@ -290,16 +286,10 @@ class ElementBinder {
     directiveRefs.forEach((DirectiveRef ref) {
       Directive annotation = ref.annotation;
       var visibility = ref.annotation.visibility;
-      if (ref.annotation is Controller) {
-        scope = scope.createChild(new PrototypeMap(scope.context));
-        nodeModule.bind(Scope, toValue: scope);
-      }
 
       _createDirectiveFactories(ref, nodeModule, node, nodesAttrsDirectives, nodeAttrs,
           visibility);
-      if (ref.annotation.module != null) {
-         nodeModule.install(ref.annotation.module());
-      }
+      if (ref.annotation.module != null) nodeModule.install(ref.annotation.module());
     });
 
     _registerViewFactory(node, parentInjector, nodeModule);

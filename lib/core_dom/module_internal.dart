@@ -17,7 +17,7 @@ import 'package:angular/core/parser/parser.dart';
 import 'package:angular/core_dom/dom_util.dart' as util;
 import 'package:angular/core_dom/static_keys.dart';
 
-import 'package:angular/change_detection/watch_group.dart' show Watch, PrototypeMap;
+import 'package:angular/change_detection/watch_group.dart' show Watch, ContextLocals;
 import 'package:angular/change_detection/ast_parser.dart';
 import 'package:angular/core/registry.dart';
 
@@ -77,7 +77,6 @@ class CoreDomModule extends Module {
     bind(ContentPort, toValue: null);
     bind(ComponentCssRewriter);
     bind(WebPlatform);
-    
     bind(Http);
     bind(UrlRewriter);
     bind(HttpBackend);
