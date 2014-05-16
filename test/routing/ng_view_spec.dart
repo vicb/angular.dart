@@ -48,7 +48,7 @@ main() => describe('ngView', () {
       microLeap();
       _.rootScope.apply();
 
-      expect(_.rootScope.context['p'].injector.get(RouteProvider) is NgView).toBeTruthy();
+      expect(_.rootScope.context.$probes['p'].injector.get(RouteProvider) is NgView).toBeTruthy();
     }));
 
 
@@ -83,8 +83,8 @@ main() => describe('ngView', () {
     it('should create and destroy a child scope', async((RootScope scope) {
       Element root = _.compile('<ng-view></ng-view>');
 
-      var getChildScope = () => scope.context['p'] == null ?
-          null : scope.context['p'].scope;
+      var getChildScope = () => scope.context.$probes['p'] == null ?
+          null : scope.context.$probes['p'].scope;
 
       expect(root).toHaveText('');
       expect(getChildScope()).toBeNull();
@@ -121,7 +121,7 @@ main() => describe('ngView', () {
     beforeEach((TestBed tb, Router _router, TemplateCache templates) {
       _ = tb;
       router = _router;
-      _.rootScope.context['flag'] = true;
+      _.rootScope.context.flag = true;
 
       templates.put('library.html', new HttpResponse(200,
           '<div><h1>Library</h1>'
@@ -172,7 +172,7 @@ main() => describe('ngView', () {
 
       expect(root.text).toEqual('LibraryBook 1234');
 
-      _.rootScope.context['flag'] = false;
+      _.rootScope.context.flag = false;
       microLeap(); _.rootScope.apply(); microLeap();
       router.route('/alt');
       microLeap(); _.rootScope.apply(); microLeap();

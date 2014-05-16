@@ -1,12 +1,12 @@
 part of angular.watch_group;
 
 class ContextLocals {
-  final Map _locals = <String, Object>{};
+  final Map _locals = new HashMap<String, Object>();
 
   final Object _parentContext;
   Object get parentContext => _parentContext;
 
-  ContextLocals(this._parentContext, [Map<String, Object> locals = null]) {
+  ContextLocals(this._parentContext, [Map<String, Object> locals]) {
     assert(_parentContext != null);
     if (locals != null) _locals.addAll(locals);
   }
