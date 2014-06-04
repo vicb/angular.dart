@@ -195,8 +195,6 @@ void testWithGetterFactory(FieldGetterFactory getterFactory) {
         try {
           for (var i = 0; i < 100000; i++) {
             if (i % 50 == 0) {
-              //print(steps);
-              //print('===================================');
               records = [];
               steps = [];
               detectors = [new DirtyCheckingChangeDetector<String>(getterFactory)];
@@ -288,6 +286,35 @@ void testWithGetterFactory(FieldGetterFactory getterFactory) {
               previous: ['1[0 -> 1]', '2[1 -> 0]'],
               additions: [],
               moves: ['2[1 -> 0]', '1[0 -> 1]'],
+              removals: []));
+        });
+
+        iit('should handle swapping elements correctly - gh1097', () {
+          var list = ['a', 'b', 'c'];
+          var record = detector.watch(list, null, null);
+          detector.collectChanges().moveNext();
+          var iterator;
+
+          list[1] = 'a';
+          list[0] = 'b';
+          iterator = detector.collectChanges();
+          expect(iterator.moveNext()).toEqual(true);
+          expect(iterator.current.currentValue, toEqualCollectionRecord(
+              collection: ['b[1 -> 0]', 'a[0 -> 1]', 'c'],
+              previous: ['a[0 -> 1]', 'b[1 -> 0]', 'c'],
+              additions: [],
+              moves: ['b[1 -> 0]', 'a[0 -> 1]', 'c'],
+              removals: []));
+
+          list[1] = 'c';
+          list[2] = 'a';
+          iterator = detector.collectChanges();
+          expect(iterator.moveNext()).toEqual(true);
+          expect(iterator.current.currentValue, toEqualCollectionRecord(
+              collection: ['b', 'c[2 -> 1]', 'a[1 -> 2]'],
+              previous: ['b', 'a[1 -> 2]', 'c[2 -> 1]'],
+              additions: [],
+              moves: ['c[2 -> 1]', 'a[1 -> 2]'],
               removals: []));
         });
       });
