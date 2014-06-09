@@ -57,8 +57,8 @@ class AngularMockModule extends Module {
     bind(Probe);
     bind(Logger);
     bind(MockHttpBackend);
-    bind(Element, toValue: document.body);
-    bind(Node, toValue: document.body);
+    bind(Element, toFactory: (i) => new DivElement()..attributes['ng-app'] = '');
+    bind(Node, toFactory: (i) => i.get(Element));
     bind(HttpBackend, toFactory: (Injector i) => i.get(MockHttpBackend));
     bind(VmTurnZone, toFactory: (_) {
       return new VmTurnZone()

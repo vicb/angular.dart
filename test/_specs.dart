@@ -109,6 +109,8 @@ main() {
   gns.beforeEach(setUpInjector, priority:3);
   gns.afterEach(tearDownInjector);
 
+  gns.afterEach(() => document.body.innerHtml = '');
+
   gns.guinnessEnableHtmlMatchers();
   gns.guinness.matchers.config.preprocessHtml = _removeNgBinding;
 }

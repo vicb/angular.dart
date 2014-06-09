@@ -5,16 +5,16 @@ import '../_specs.dart';
 //TODO(misko): re-enabled disabled tests once we have forms.
 
 main() {
-  describe('input-select', () {
+  ddescribe('input-select', () {
 
     describe('ng-value', () {
       TestBed _;
       beforeEach((TestBed tb) => _ = tb);
 
-      it('should retrieve using ng-value', () {
+      it('should retrieve using bind-ng-value', () {
         _.compile(
-            '<select ng-model="robot" probe="p">'
-              '<option ng-repeat="r in robots" ng-value="r">{{r.name}}</option>'
+            '<select bind-ng-model="robot" probe="p">'
+              '<option ng-repeat="r in robots" bind-ng-value="r">{{r.name}}</option>'
             '</select>');
         var r2d2 = {"name":"r2d2"};
         var c3p0 = {"name":"c3p0"};
@@ -29,10 +29,10 @@ main() {
         expect(_.rootElement).toEqualSelect([['r2d2'], 'c3p0']);
       });
 
-      it('should retrieve using ng-value', () {
+      it('should retrieve using bind-ng-value', () {
         _.compile(
-            '<select ng-model="robot" probe="p" multiple>'
-            '<option ng-repeat="r in robots" ng-value="r">{{r.name}}</option>'
+            '<select bind-ng-model="robot" probe="p" multiple>'
+            '<option ng-repeat="r in robots" bind-ng-value="r">{{r.name}}</option>'
             '</select>');
         var r2d2 = { "name":"r2d2"};
         var c3p0 = {"name":"c3p0"};
@@ -84,7 +84,7 @@ main() {
 
       it('should work with repeated value options', () {
         _.compile(
-            '<select ng-model="robot" probe="p">'
+            '<select bind-ng-model="robot" probe="p">'
               '<option ng-repeat="r in robots">{{r}}</option>'
             '</select>');
 
@@ -120,7 +120,7 @@ main() {
       describe('empty option', () {
         it('should select the empty option when model is undefined', () {
           _.compile(
-              '<select ng-model="robot">' +
+              '<select bind-ng-model="robot">' +
                 '<option value="">--select--</option>' +
                 '<option value="x">robot x</option>' +
                 '<option value="y">robot y</option>' +
@@ -132,7 +132,7 @@ main() {
 
         it('should support defining an empty option anywhere in the option list', () {
           _.compile(
-              '<select ng-model="robot">' +
+              '<select bind-ng-model="robot">' +
                 '<option value="x">robot x</option>' +
                 '<option value="">--select--</option>' +
                 '<option value="y">robot y</option>' +
@@ -145,7 +145,7 @@ main() {
         it('should set the model to empty string when empty option is selected', () {
           _.rootScope.context['robot'] = 'x';
           _.compile(
-              '<select ng-model="robot" probe="p">' +
+              '<select bind-ng-model="robot" probe="p">' +
                 '<option value="">--select--</option>' +
                 '<option value="x">robot x</option>' +
                 '<option value="y">robot y</option>' +
@@ -166,7 +166,7 @@ main() {
           it('should select empty option when model is undefined', () {
             _.rootScope.context['robots'] = ['c3p0', 'r2d2'];
             _.compile(
-                '<select ng-model="robot">' +
+                '<select bind-ng-model="robot">' +
                   '<option value="">--select--</option>' +
                   '<option ng-repeat="r in robots">{{r}}</option>' +
                 '</select>');
@@ -177,7 +177,7 @@ main() {
           it('should set model to empty string when selected', () {
             _.rootScope.context['robots'] = ['c3p0', 'r2d2'];
             _.compile(
-                '<select ng-model="robot" probe="p">' +
+                '<select bind-ng-model="robot" probe="p">' +
                   '<option value="">--select--</option>' +
                   '<option ng-repeat="r in robots">{{r}}</option>' +
                 '</select>');
@@ -196,7 +196,7 @@ main() {
 
           it('should not break if both the select and repeater models change at once', () {
             _.compile(
-                '<select ng-model="robot">' +
+                '<select bind-ng-model="robot">' +
                   '<option value="">--select--</option>' +
                   '<option ng-repeat="r in robots">{{r}}</option>' +
                 '</select>');
@@ -220,7 +220,7 @@ main() {
 
           it("should insert&select temporary unknown option when no options-model match", () {
             _.compile(
-                '<select ng-model="robot">' +
+                '<select bind-ng-model="robot">' +
                   '<option>c3p0</option>' +
                   '<option>r2d2</option>' +
                 '</select>');
@@ -242,7 +242,7 @@ main() {
           it("should NOT insert temporary unknown option when model is undefined and empty " +
           "options is present", () {
             _.compile(
-                '<select ng-model="robot">' +
+                '<select bind-ng-model="robot">' +
                   '<option value="">--select--</option>' +
                   '<option>c3p0</option>' +
                   '<option>r2d2</option>' +
@@ -272,7 +272,7 @@ main() {
           "option is present and model is defined", () {
             _.rootScope.context['robot'] = 'wallee';
             _.compile(
-                '<select ng-model="robot">' +
+                '<select bind-ng-model="robot">' +
                   '<option value="">--select--</option>' +
                   '<option>c3p0</option>' +
                   '<option>r2d2</option>' +
@@ -291,7 +291,7 @@ main() {
             it('should work with repeated options', () {
               _.rootScope.context['robots'] = [];
               _.compile(
-                  '<select ng-model="robot">' +
+                  '<select bind-ng-model="robot">' +
                     '<option ng-repeat="r in robots">{{r}}</option>' +
                   '</select>');
               _.rootScope.apply(() {
@@ -316,7 +316,7 @@ main() {
 
             it('should work with empty option and repeated options', () {
               _.compile(
-                  '<select ng-model="robot">' +
+                  '<select bind-ng-model="robot">' +
                     '<option value="">--select--</option>' +
                     '<option ng-repeat="r in robots">{{r}}</option>' +
                   '</select>');
@@ -344,7 +344,7 @@ main() {
             'unavailable', () {
 
               _.compile(
-                  '<select ng-model="robot">' +
+                  '<select bind-ng-model="robot">' +
                     '<option ng-repeat="r in robots">{{r}}</option>' +
                   '</select>');
               _.rootScope.apply(() {
@@ -380,8 +380,8 @@ main() {
       it('issue #392', () {
         _.compile(
             '<div>' +
-              '<div ng-if="attached">' +
-                '<select ng-model="model">' +
+              '<div bind-ng-if="attached">' +
+                '<select bind-ng-model="model">' +
                   '<option value="a">foo</option>' +
                   '<option value="b">bar</option>' +
                 '</select>' +
@@ -403,8 +403,8 @@ main() {
       it('issue #428', () {
         _.compile(
             '<div>' +
-              '<div ng-if="attached">' +
-                '<select ng-model="model" multiple>' +
+              '<div bind-ng-if="attached">' +
+                '<select bind-ng-model="model" multiple>' +
                   '<option value="a">foo</option>' +
                   '<option value="b">bar</option>' +
                 '</select>' +
@@ -430,8 +430,8 @@ main() {
 
       var scope, formElement, element;
 
-      compile(html) {
-        _.compile('<form name="form">' + html + '</form>');
+      compile(html, {renderTree: false}) {
+        _.compile('<form name="form">' + html + '</form>', renderTree: renderTree);
         element = _.rootElement.querySelector('select');
         scope.apply();
       }
@@ -478,10 +478,10 @@ main() {
         it('should fire ng-change event.', () {
           var log = '';
           compile(
-              '<select name="select" ng-model="selection" ng-change="change()">' +
+              '<select name="select" bind-ng-model="selection" on-change="change()">' +
                 '<option value=""></option>' +
                 '<option value="c">C</option>' +
-              '</select>');
+              '</select>', renderTree: true);
 
           scope.context['change'] = () {
             log += 'change:${scope.context['selection']};';
@@ -499,10 +499,10 @@ main() {
 
         it('should require', () {
           compile(
-            '<select name="select" ng-model="selection" probe="i" required ng-change="change()">' +
+            '<select name="select" bind-ng-model="selection" probe="i" required on-change="change()">' +
               '<option value=""></option>' +
               '<option value="c">C</option>' +
-            '</select>');
+            '</select>', renderTree: true);
 
           var element = scope.context['i'].element;
 
@@ -541,7 +541,7 @@ main() {
 
         it('should not be invalid if no require', () {
           compile(
-            '<select name="select" ng-model="selection">' +
+            '<select name="select" bind-ng-model="selection">' +
               '<option value=""></option>' +
               '<option value="c">C</option>' +
             '</select>');
@@ -554,7 +554,7 @@ main() {
         describe('empty option', () {
 
           it('should select the empty option when model is undefined', () {
-            compile('<select ng-model="robot">' +
+            compile('<select bind-ng-model="robot">' +
                       '<option value="">--select--</option>' +
                       '<option value="x">robot x</option>' +
                       '<option value="y">robot y</option>' +
@@ -565,7 +565,7 @@ main() {
 
 
           it('should support defining an empty option anywhere in the option list', () {
-            compile('<select ng-model="robot">' +
+            compile('<select bind-ng-model="robot">' +
                       '<option value="x">robot x</option>' +
                       '<option value="">--select--</option>' +
                       '<option value="y">robot y</option>' +
@@ -579,9 +579,9 @@ main() {
 
       describe('select-multiple', () {
 
-        it('should support type="select-multiple"', () {
+        iit('should support type="select-multiple"', () {
           compile(
-            '<select ng-model="selection" multiple>' +
+            '<select bind-ng-model="selection" multiple>' +
               '<option>A</option>' +
               '<option>B</option>' +
             '</select>');
@@ -600,7 +600,7 @@ main() {
         });
 
         it('should work with optgroups', () {
-          compile('<select ng-model="selection" multiple>' +
+          compile('<select bind-ng-model="selection" multiple>' +
                     '<optgroup label="group1">' +
                       '<option>A</option>' +
                       '<option>B</option>' +
@@ -623,7 +623,7 @@ main() {
 
         it('should require', () {
           compile(
-            '<select name="select" probe="i" ng-model="selection" multiple required>' +
+            '<select name="select" probe="i" bind-ng-model="selection" multiple required>' +
               '<option>A</option>' +
               '<option>B</option>' +
             '</select>');
@@ -666,7 +666,7 @@ main() {
           html += '>' +
             (blank != null ? (blank is String ? blank : '<option value="">blank</option>') : '') +
             (unknown != null ? (unknown is String ? unknown : '<option value="?">unknown</option>') : '') +
-            (ngRepeat != null ? '<option ng-repeat="$ngRepeat" ng-value="$ngValue">{{$text}}</option>' : '') +
+            (ngRepeat != null ? '<option ng-repeat="$ngRepeat" bind-ng-value="$ngValue">{{$text}}</option>' : '') +
           '</select>';
 
           compile(html);
@@ -867,7 +867,7 @@ main() {
 
           it('should bind to scope value and group', () {
             var element = _.compile(
-                '<select ng-model="selected" probe="p">'
+                '<select bind-ng-model="selected" probe="p">'
                   '<optgroup label=\'{{ group["title"] }}\' ng-repeat="group in values">'
                     '<option value=\'{{ item["val"] }}\' '
                             'ng-repeat=\'item in group["items"]\'>{{ item["name"] }}</option>'
@@ -1265,18 +1265,18 @@ main() {
       describe('option', () {
 
         it('should populate value attribute on OPTION', () {
-          compile('<select ng-model="x"><option selected>abc</option></select>');
+          compile('<select bind-ng-model="x"><option selected>abc</option></select>');
           expect(element).toEqualSelect([['?'], 'abc']);
         });
 
         it('should ignore value if already exists', () {
-          compile('<select ng-model="x"><option value="abc">xyz</option></select>');
+          compile('<select bind-ng-model="x"><option value="abc">xyz</option></select>');
           expect(element).toEqualSelect([['?'], 'abc']);
         });
 
         it('should set value even if self closing HTML', () {
           scope.context['x'] = 'hello';
-          compile('<select ng-model="x"><option>hello</select>');
+          compile('<select bind-ng-model="x"><option>hello</select>');
           expect(element).toEqualSelect([['hello']]);
         });
 

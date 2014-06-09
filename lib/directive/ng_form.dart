@@ -6,18 +6,12 @@ part of angular.directive;
  * or prevent the default browser submission from occurring.
  */
 @Decorator(
-    selector: 'form',
-    module: NgForm.module)
-@Decorator(
-    selector: 'fieldset',
-    module: NgForm.module)
-@Decorator(
-    selector: '.ng-form',
-    module: NgForm.module)
-@Decorator(
-    selector: '[ng-form]',
+    selector: '[ng-form], form, fieldset, .ng-form',
     module: NgForm.module,
-    map: const { 'ng-form': '@name' })
+    bind: const {
+        'ngForm': 'name',
+        'name': 'name'
+    })
 class NgForm extends NgControl {
   static final Module _module = new Module()
       ..bind(NgControl, toFactory: (i) => i.get(NgForm));
@@ -53,7 +47,6 @@ class NgForm extends NgControl {
     * The name of the control. This is usually fetched via the name attribute that is
     * present on the element that the control is bound to.
     */
-  @NgAttr('name')
   get name => _name;
   set name(String value) {
     if (value != null) {
@@ -71,8 +64,9 @@ class NgForm extends NgControl {
     * Returns the child control that is associated with the given name. If multiple
     * child controls contain the same name then the first instance will be returned.
     */
-  NgControl operator[](String name) =>
-      controls.containsKey(name) ? controls[name][0] : null;
+  NgControl operator[](String name) {
+    return controls.containsKey(name) ? controls[name][0] : null;
+  }
 }
 
 class NgNullForm extends NgNullControl implements NgForm {

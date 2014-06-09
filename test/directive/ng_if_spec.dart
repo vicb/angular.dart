@@ -28,7 +28,7 @@ main() {
     logger = _logger;
     compile = (html, [applyFn]) {
       element = e(html);
-      compiler([element], _directives)(injector, [element]);
+      compiler([element], _directives, compileInPlace: true)(injector, scope);
       scope.apply(applyFn);
     };
     directives = _directives;
@@ -48,8 +48,8 @@ main() {
   }
 
   they('should add/remove the element',
-    [ '<div><span ng-if="isVisible">content</span></div>',
-      '<div><span ng-unless="!isVisible">content</span></div>'],
+    [ '<div><span bind-ng-if="isVisible">content</span></div>',
+      '<div><span bind-ng-unless="!isVisible">content</span></div>'],
     (html) {
       compile(html);
       // The span node should NOT exist in the DOM.
@@ -74,14 +74,14 @@ main() {
     [
       // ng-if
       '<div>' +
-      '  <div ng-if="isVisible">'.trim() +
+      '  <div bind-ng-if="isVisible">'.trim() +
       '    <span child-controller id="inside">inside {{setBy}};</span>'.trim() +
       '  </div>'.trim() +
       '  <span id="outside">outside {{setBy}}</span>'.trim() +
       '</div>',
       // ng-unless
       '<div>' +
-      '  <div ng-unless="!isVisible">'.trim() +
+      '  <div bind-ng-unless="!isVisible">'.trim() +
       '    <span child-controller id="inside">inside {{setBy}};</span>'.trim() +
       '  </div>'.trim() +
       '  <span id="outside">outside {{setBy}}</span>'.trim() +
@@ -108,13 +108,13 @@ main() {
       // ng-if
       '<div>' +
       '  <div ng-repeat="i in values">repeat;</div>'.trim() +
-      '  <div ng-if="values.length==4">if;</div>'.trim() +
+      '  <div bind-ng-if="values.length==4">if;</div>'.trim() +
       '  <div ng-repeat="i in values">repeat2;</div>'.trim() +
       '</div>',
       // ng-unless
       '<div>' +
       '  <div ng-repeat="i in values">repeat;</div>'.trim() +
-      '  <div ng-unless="values.length!=4">if;</div>'.trim() +
+      '  <div bind-ng-unless="values.length!=4">if;</div>'.trim() +
       '  <div ng-repeat="i in values">repeat2;</div>'.trim() +
       '</div>'],
     (html) {
@@ -134,8 +134,8 @@ main() {
 
   they('should restore the element to its compiled state',
     [
-      '<div><span class="my-class" ng-if="isVisible">content</span></div>',
-      '<div><span class="my-class" ng-unless="!isVisible">content</span></div>'],
+      '<div><span class="my-class" bind-ng-if="isVisible">content</span></div>',
+      '<div><span class="my-class" bind-ng-unless="!isVisible">content</span></div>'],
     (html) {
       rootScope.context['isVisible'] = true;
       compile(html);
@@ -154,10 +154,10 @@ main() {
     }
   );
 
-  they('should not cause ng-click to throw an exception',
+  they('should not cause on-click to throw an exception',
     [
-      '<div><span ng-click="click" ng-if="isVisible">content</span></div>',
-      '<div><span ng-click="click" ng-unless="!isVisible">content</span></div>'],
+      '<div><span on-click="click" bind-ng-if="isVisible">content</span></div>',
+      '<div><span on-click="click" bind-ng-unless="!isVisible">content</span></div>'],
     (html) {
       compile(html);
       rootScope.apply(() {
@@ -169,8 +169,8 @@ main() {
 
   they('should prevent other directives from running when disabled',
     [
-      '<div><li log="ALWAYS"></li><span log="JAMES" ng-if="isVisible">content</span></div>',
-      '<div><li log="ALWAYS"></li><span log="JAMES" ng-unless="!isVisible">content</span></div>'],
+      '<div><li log="ALWAYS"></li><span log="JAMES" bind-ng-if="isVisible">content</span></div>',
+      '<div><li log="ALWAYS"></li><span log="JAMES" bind-ng-unless="!isVisible">content</span></div>'],
     (html) {
       compile(html);
       expect(element.querySelectorAll('span').length).toEqual(0);
@@ -192,8 +192,8 @@ main() {
 
   they('should prevent other directives from running when disabled',
   [
-    '<div><div ng-if="a"><div ng-if="b">content</div></div></div>',
-    '<div><div ng-unless="!a"><div ng-unless="!b">content</div></div></div>'],
+    '<div><div bind-ng-if="a"><div bind-ng-if="b">content</div></div></div>',
+    '<div><div bind-ng-unless="!a"><div bind-ng-unless="!b">content</div></div></div>'],
     (html) {
       compile(html);
       expect(element.querySelectorAll('span').length).toEqual(0);

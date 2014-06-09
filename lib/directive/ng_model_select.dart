@@ -18,11 +18,14 @@ part of angular.directive;
  *
  */
 @Decorator(
-    selector: 'select[ng-model]')
+    selector: 'select[ng-model]',
+    bind: const {
+      'multiple': 'multiple'
+    }
+)
 class InputSelect implements AttachAware {
   final expando = new Expando<OptionValue>();
   final dom.SelectElement _selectElement;
-  final NodeAttrs _attrs;
   final NgModel _model;
   final Scope _scope;
 
@@ -32,27 +35,23 @@ class InputSelect implements AttachAware {
   _SelectMode _mode = new _SelectMode(null, null, null);
   bool _dirty = false;
 
-  InputSelect(dom.Element this._selectElement, this._attrs, this._model,
-              this._scope) {
+  InputSelect(dom.Element this._selectElement, this._model, this._scope) {
     _unknownOption.value = '?';
     _nullOption = _selectElement.querySelectorAll('option')
         .firstWhere((o) => o.value == '', orElse: () => null);
   }
 
-  attach() {
-    _attrs.observe('multiple', (value) {
-      _mode.destroy();
-      if (value == null) {
-        _model.watchCollection = false;
-        _mode = new _SingleSelectMode(expando, _selectElement, _model,
-            _nullOption, _unknownOption);
-      } else {
-        _model.watchCollection = true;
-        _mode = new _MultipleSelectionMode(expando, _selectElement, _model);
-      }
-      _mode.onModelChange(_model.viewValue);
-    });
+  set multiple(value) {
+    _mode.destroy();
+    if (value) {
+      _mode = new _MultipleSelectionMode(expando, _selectElement, _model);
+    } else {
+      _mode = new _SingleSelectMode(expando, _selectElement, _model, _nullOption, _unknownOption);
+    }
+    _mode.onModelChange(_model.viewValue);
+  }
 
+  attach() {
     _selectElement.onChange.listen((event) => _mode.onViewChange(event));
     _model.render = (value) {
       // TODO(misko): this hack need to delay the rendering until after domRead

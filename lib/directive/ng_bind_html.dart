@@ -16,7 +16,8 @@ part of angular.directive;
  */
 @Decorator(
   selector: '[ng-bind-html]',
-  map: const {'ng-bind-html': '=>value'})
+  canChangeModel: false,
+  bind: const {'ngBindHtml': 'value'})
 class NgBindHtml {
   final dom.Element element;
   final dom.NodeValidator validator;

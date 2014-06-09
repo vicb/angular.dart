@@ -138,6 +138,7 @@ abstract class NgControl implements AttachAware, DetachAware {
    * * [control] - The form control which will be registered (see [NgControl]).
    */
   void addControl(NgControl control) {
+    assert(_controls.contains(control) == false);
     _controls.add(control);
     if (control.name != null) {
       _controlByName.putIfAbsent(control.name, () => <NgControl>[]).add(control);

@@ -63,7 +63,7 @@ void main() {
       final String dtAsString = "2014-03-29";
 
       it('should update input value from DateTime model property', () {
-        _.compile('<input type=date ng-model=model>');
+        _.compile('<input type=date bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -75,7 +75,7 @@ void main() {
       });
 
       it('should update input value from String model property', () {
-        _.compile('<input type=date ng-bind-type=string ng-model=model>');
+        _.compile('<input type=date ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         // if(!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -87,9 +87,10 @@ void main() {
       });
 
       it('should update model from the input "valueAsDate" IDL attribute', () {
-        _.compile('<input type=date ng-model=model>');
+        _.compile('<input type=date bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.valueAsDate = dateTime;
         _.triggerEvent(inputElement, 'change');
@@ -97,9 +98,10 @@ void main() {
       });
 
       it('should update model from the input "value" IDL attribute', () {
-        _.compile('<input type=date ng-model=model>');
+        _.compile('<input type=date bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.value = dtAsString;
         _.triggerEvent(inputElement, 'change');
@@ -107,7 +109,7 @@ void main() {
       });
 
       it('should clear input when model is the empty string', () {
-        _.compile('<input type=date ng-model=model>');
+        _.compile('<input type=date bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -122,7 +124,7 @@ void main() {
       });
 
       it('should clear valid input when model is set to null', () {
-        _.compile('<input type=date ng-model=model>');
+        _.compile('<input type=date bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -142,7 +144,7 @@ void main() {
       final String dtAsString = "23:45:16";
 
       it('should update input value from DateTime model property', () {
-        _.compile('<input type=time ng-model=model>');
+        _.compile('<input type=time bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -154,7 +156,7 @@ void main() {
       });
 
       it('should update input value from String model property', () {
-        _.compile('<input type=time ng-bind-type=string ng-model=model>');
+        _.compile('<input type=time ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         // if(!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -166,9 +168,10 @@ void main() {
       });
 
       it('should update model from the input "valueAsDate" IDL attribute', () {
-        _.compile('<input type=time ng-model=model>');
+        _.compile('<input type=time bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.valueAsDate = dateTime;
         _.triggerEvent(inputElement, 'change');
@@ -176,9 +179,10 @@ void main() {
       });
 
       it('should update model from the input "value" IDL attribute', () {
-        _.compile('<input type=time ng-model=model>');
+        _.compile('<input type=time bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.value = dtAsString;
         _.triggerEvent(inputElement, 'change');
@@ -186,7 +190,7 @@ void main() {
       });
 
       it('should clear input when model is the empty string', () {
-        _.compile('<input type=time ng-model=model>');
+        _.compile('<input type=time bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -201,7 +205,7 @@ void main() {
       });
 
       it('should clear valid input when model is set to null', () {
-        _.compile('<input type=time ng-model=model>');
+        _.compile('<input type=time bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -222,7 +226,7 @@ void main() {
       final String dtAsString = "2014-03-30T23:45:16";
 
       it('should update input value from num model', () {
-        _.compile('<input type=datetime-local ng-model=model>');
+        _.compile('<input type=datetime-local bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -235,7 +239,7 @@ void main() {
 
       it('should update input value from String model property', () {
         _.compile(
-            '<input type=datetime-local ng-bind-type=string ng-model=model>');
+            '<input type=datetime-local ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
 
         _.rootScope.apply();
@@ -247,9 +251,10 @@ void main() {
 
       it('should update model from the input "valueAsNumber" IDL attribute', ()
           {
-        _.compile('<input type=datetime-local ng-model=model>');
+        _.compile('<input type=datetime-local bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.valueAsNumber = dateTime;
         expect(inputElement.valueAsNumber).toEqual(dateTime);
@@ -258,9 +263,10 @@ void main() {
       });
 
       it('should update model from the input "value" IDL attribute', () {
-        _.compile('<input type=datetime-local ng-model=model>');
+        _.compile('<input type=datetime-local bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.value = dtAsString;
         _.triggerEvent(inputElement, 'change');
@@ -268,7 +274,7 @@ void main() {
       });
 
       it('should clear input when model is the empty string', () {
-        _.compile('<input type=datetime-local ng-model=model>');
+        _.compile('<input type=datetime-local bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -283,7 +289,7 @@ void main() {
       });
 
       it('should clear valid input when model is set to null', () {
-        _.compile('<input type=datetime-local ng-model=model>');
+        _.compile('<input type=datetime-local bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -308,7 +314,7 @@ void main() {
       final String dtAsString = "2014-03-30T23:45:16";
 
       it('should update input value from String model property', () {
-        _.compile('<input type=datetime ng-bind-type=string ng-model=model>');
+        _.compile('<input type=datetime ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
 
         _.rootScope.apply();
@@ -319,7 +325,7 @@ void main() {
       });
 
       it('should update model from the input "value" IDL attribute', () {
-        _.compile('<input type=datetime ng-bind-type=string ng-model=model>');
+        _.compile('<input type=datetime ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement, shouldWorkForChrome:
             false)) return; // skip test
@@ -335,7 +341,7 @@ void main() {
       final String dtAsString = "2014-03";
 
       it('should update input value from DateTime model property', () {
-        _.compile('<input type=month ng-model=model>');
+        _.compile('<input type=month bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -347,7 +353,7 @@ void main() {
       });
 
       it('should update input value from String model property', () {
-        _.compile('<input type=month ng-bind-type=string ng-model=model>');
+        _.compile('<input type=month ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
 
         _.rootScope.apply();
@@ -358,9 +364,10 @@ void main() {
       });
 
       it('should update model from the input "valueAsDate" IDL attribute', () {
-        _.compile('<input type=month ng-model=model>');
+        _.compile('<input type=month bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.valueAsDate = dateTime;
         _.triggerEvent(inputElement, 'change');
@@ -368,9 +375,10 @@ void main() {
       });
 
       it('should update model from the input "value" IDL attribute', () {
-        _.compile('<input type=month ng-model=model>');
+        _.compile('<input type=month bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.value = dtAsString;
         _.triggerEvent(inputElement, 'change');
@@ -378,7 +386,7 @@ void main() {
       });
 
       it('should clear input when model is the empty string', () {
-        _.compile('<input type=month ng-model=model>');
+        _.compile('<input type=month bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -393,7 +401,7 @@ void main() {
       });
 
       it('should clear valid input when model is set to null', () {
-        _.compile('<input type=month ng-model=model>');
+        _.compile('<input type=month bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -413,7 +421,7 @@ void main() {
       final String dtAsString = "2014-W14";
 
       it('should update input value from DateTime model property', () {
-        _.compile('<input type=week ng-model=model>');
+        _.compile('<input type=week bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -425,7 +433,7 @@ void main() {
       });
 
       it('should update input value from String model property', () {
-        _.compile('<input type=week ng-bind-type=string ng-model=model>');
+        _.compile('<input type=week ng-bind-type=string bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
 
         _.rootScope.apply();
@@ -436,9 +444,10 @@ void main() {
       });
 
       it('should update model from the input "valueAsDate" IDL attribute', () {
-        _.compile('<input type=week ng-model=model>');
+        _.compile('<input type=week bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.valueAsDate = dateTime;
         _.triggerEvent(inputElement, 'change');
@@ -446,9 +455,10 @@ void main() {
       });
 
       it('should update model from the input "value" IDL attribute', () {
-        _.compile('<input type=week ng-model=model>');
+        _.compile('<input type=week bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
+        _.rootScope.apply();
 
         inputElement.value = dtAsString;
         _.triggerEvent(inputElement, 'change');
@@ -456,7 +466,7 @@ void main() {
       });
 
       it('should clear input when model is the empty string', () {
-        _.compile('<input type=week ng-model=model>');
+        _.compile('<input type=week bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
@@ -471,7 +481,7 @@ void main() {
       });
 
       it('should clear valid input when model is set to null', () {
-        _.compile('<input type=week ng-model=model>');
+        _.compile('<input type=week bind-ng-model=model>');
         inputElement = _.rootElement as dom.InputElement;
         if (!nonTextInputElementSupported(inputElement)) return; // skip test
 
