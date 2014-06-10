@@ -514,19 +514,10 @@ class DirtyCheckingRecord<H> implements Record<H>, WatchRecord<H> {
     }
 
     var last = currentValue;
-    if (!identical(last, current)) {
-      if (last is String && current is String &&
-          last == current) {
-        // This is false change in strings we need to recover, and pretend it
-        // is the same. We save the value so that next time identity will pass
-        currentValue = current;
-      } else if (last is num && last.isNaN && current is num && current.isNaN) {
-        // we need this for the compiled JavaScript since in JS NaN !== NaN.
-      } else {
-        previousValue = last;
-        currentValue = current;
-        return true;
-      }
+    if (!_looseIdentical(last, current)) {
+      previousValue = currentValue;
+      currentValue = current;
+      return true;
     }
     return false;
   }
@@ -620,14 +611,10 @@ class _MapChangeRecord<K, V> implements MapChangeRecord<K, V> {
       var newSeqRecord;
       if (oldSeqRecord != null && key == oldSeqRecord.key) {
         newSeqRecord = oldSeqRecord;
-        if (!identical(value, oldSeqRecord._currentValue)) {
+        if (!_looseIdentical(value, oldSeqRecord._currentValue)) {
           var prev = oldSeqRecord._previousValue = oldSeqRecord._currentValue;
           oldSeqRecord._currentValue = value;
-          if (!((value is String && prev is String && value == prev) ||
-                (value is num && value.isNaN && prev is num && prev.isNaN))) {
-            // Check string by value rather than reference
-            _addToChanges(oldSeqRecord);
-          }
+          _addToChanges(oldSeqRecord);
         }
       } else {
         seqChanged = true;
@@ -953,7 +940,7 @@ class _CollectionChangeRecord<V> implements CollectionChangeRecord<V> {
       _length = list.length;
       for (int index = 0; index < _length; index++) {
         var item = list[index];
-        if (record == null || !identical(item, record.item)) {
+        if (record == null || !_looseIdentical(record.item, item)) {
           record = mismatch(record, item, index);
           maybeDirty = true;
         } else if (maybeDirty) {
@@ -965,7 +952,7 @@ class _CollectionChangeRecord<V> implements CollectionChangeRecord<V> {
     } else {
       int index = 0;
       for (var item in collection) {
-        if (record == null || !identical(item, record.item)) {
+        if (record == null || !_looseIdentical(record.item, item)) {
           record = mismatch(record, item, index);
           maybeDirty = true;
         } else if (maybeDirty) {
@@ -1035,19 +1022,6 @@ class _CollectionChangeRecord<V> implements CollectionChangeRecord<V> {
    * - [index] is the position of the item in the collection
    */
   ItemRecord<V> mismatch(ItemRecord<V> record, item, int index) {
-    if (record != null) {
-      if (item is String && record.item is String && record.item == item) {
-        // this is false change in strings we need to recover, and pretend it is
-        // the same. We save the value so that next time identity can pass
-        return record..item = item;
-      }
-
-      if (item is num && (item as num).isNaN && record.item is num && (record.item as num).isNaN) {
-        // we need this for JavaScript since in JS NaN !== NaN.
-        return record;
-      }
-    }
-
     // The previous record after which we will append the current one.
     ItemRecord<V> previousRecord;
 
@@ -1365,7 +1339,7 @@ class _DuplicateItemRecordList {
     ItemRecord record;
     for (record = _head; record != null; record = record._nextDup) {
       if ((afterIndex == null || afterIndex < record.currentIndex) &&
-          identical(record.item, item)) {
+          _looseIdentical(record.item, item)) {
         return record;
       }
     }
@@ -1447,4 +1421,28 @@ class DuplicateMap {
   }
 
   String toString() => "DuplicateMap($map)";
+}
+
+/**
+ * Returns whether the [dst] and [src] are lossely identical:
+ * * true when the value are identical,
+ * * true when both values are equal strings,
+ * * true when both values are NaN
+ *
+ * If both values are equal string, src is assigned to dst.
+ */
+bool _looseIdentical(dst, src) {
+  if (identical(dst, src)) return true;
+
+  if (dst is String && src is String && dst == src) {
+    // this is false change in strings we need to recover, and pretend it is the same. We save the
+    // value so that next time identity can pass
+    dst = src;
+    return true;
+  }
+
+  //  we need this for JavaScript since in JS NaN !== NaN.
+  if (dst is num && (dst as num).isNaN && src is num && (src as num).isNaN) return true;
+
+  return false;
 }
