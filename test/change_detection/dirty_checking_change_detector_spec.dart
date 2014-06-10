@@ -118,9 +118,9 @@ void testWithGetterFactory(FieldGetterFactory getterFactory) {
       it('should remove all watches in group and group\'s children', () {
         var obj = {};
         detector.watch(obj, 'a', '0a');
-        var child1a = detector.newGroup();
-        var child1b = detector.newGroup();
-        var child2 = child1a.newGroup();
+        var child1a = detector.createChild();
+        var child1b = detector.createChild();
+        var child2 = child1a.createChild();
         child1a.watch(obj,'a', '1a');
         child1b.watch(obj,'a', '1b');
         detector.watch(obj, 'a', '0A');
@@ -140,7 +140,7 @@ void testWithGetterFactory(FieldGetterFactory getterFactory) {
       it('should add watches within its own group', () {
         var obj = {};
         var ra = detector.watch(obj, 'a', 'a');
-        var child = detector.newGroup();
+        var child = detector.createChild();
         var cb = child.watch(obj,'b', 'b');
         var iterotar;
 
@@ -163,19 +163,19 @@ void testWithGetterFactory(FieldGetterFactory getterFactory) {
       });
 
       it('should properly add children', () {
-        var a = detector.newGroup();
-        var aChild = a.newGroup();
-        var b = detector.newGroup();
+        var a = detector.createChild();
+        var aChild = a.createChild();
+        var b = detector.createChild();
         expect(detector.collectChanges).not.toThrow();
       });
 
       it('should properly disconnect group in case watch is removed in disconected group', () {
         var map = {};
         var detector0 = new DirtyCheckingChangeDetector<String>(getterFactory);
-          var detector1 = detector0.newGroup();
-            var detector2 = detector1.newGroup();
+          var detector1 = detector0.createChild();
+            var detector2 = detector1.createChild();
             var watch2 = detector2.watch(map, 'f1', null);
-          var detector3 = detector0.newGroup();
+          var detector3 = detector0.createChild();
           detector1.remove();
             watch2.remove(); // removing a dead record
           detector3.watch(map, 'f2', null);
@@ -205,7 +205,7 @@ void testWithGetterFactory(FieldGetterFactory getterFactory) {
                 var index = random.nextInt(detectors.length);
                 ChangeDetectorGroup detector = detectors[index];
                 step('detectors[$index].newGroup()');
-                var child = detector.newGroup();
+                var child = detector.createChild();
                 detectors.add(child);
                 break;
               case 1: // add watch

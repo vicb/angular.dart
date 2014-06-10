@@ -29,7 +29,7 @@ abstract class ChangeDetectorGroup<H> {
   void remove();
 
   /// Create a child [ChangeDetectorGroup]
-  ChangeDetectorGroup<H> newGroup();
+  ChangeDetectorGroup<H> createChild();
 }
 
 /**
@@ -100,6 +100,7 @@ abstract class WatchRecord<H> extends Record<H> {
   /// Returns [:true:] when changes have been detected
   bool check();
 
+  /// Unlink this record
   void remove();
 }
 

@@ -332,8 +332,8 @@ class Scope {
   Scope createChild(Object childContext) {
     assert(isAttached);
     var child = new Scope(childContext, rootScope, this,
-                          _readWriteGroup.newGroup(childContext),
-                          _readOnlyGroup.newGroup(childContext),
+                          _readWriteGroup.createChild(childContext),
+                          _readOnlyGroup.createChild(childContext),
                          '$id:${_childScopeNextId++}',
                          _stats);
 

@@ -39,7 +39,7 @@ void main() {
       AST ast = parse(expression);
 
       if (evalContext == null) evalContext = context;
-      WatchGroup group = watchGrp.newGroup(evalContext);
+      WatchGroup group = watchGrp.createChild(evalContext);
 
       List log = [];
       Watch watch = group.watch(ast, (v, p) => log.add(v));
@@ -74,7 +74,7 @@ void main() {
 
     it('should have a toString for debugging', () {
       watchGrp.watch(parse('a'), (v, p) {});
-      watchGrp.newGroup({});
+      watchGrp.createChild({});
       expect("$watchGrp").toEqual(
           'WATCHES: MARKER[null], MARKER[null]\n'
           'WatchGroup[](watches: MARKER[null])\n'
@@ -235,7 +235,7 @@ void main() {
         watchGrp.detectChanges();
         expect(logger).toEqual(['hello']);
 
-        // make sore no new changes are logged on extra detectChanges
+        // make sure no new changes are logged on extra detectChanges
         watchGrp.detectChanges();
         expect(logger).toEqual(['hello']);
 
@@ -850,9 +850,9 @@ void main() {
     describe('child group', () {
       it('should remove all field watches in group and group\'s children', () {
         watchGrp.watch(parse('a'), (v, p) => logger('0a'));
-        var child1a = watchGrp.newGroup(new PrototypeMap(context));
-        var child1b = watchGrp.newGroup(new PrototypeMap(context));
-        var child2 = child1a.newGroup(new PrototypeMap(context));
+        var child1a = watchGrp.createChild(new PrototypeMap(context));
+        var child1b = watchGrp.createChild(new PrototypeMap(context));
+        var child2 = child1a.createChild(new PrototypeMap(context));
         child1a.watch(parse('a'), (v, p) => logger('1a'));
         child1b.watch(parse('a'), (v, p) => logger('1b'));
         watchGrp.watch(parse('a'), (v, p) => logger('0A'));
@@ -886,10 +886,10 @@ void main() {
         watchGrp.watch(countMethod, (v, p) => logger('0a'));
         expectOrder(['0a']);
 
-        var child1a = watchGrp.newGroup(new PrototypeMap(context));
-        var child1b = watchGrp.newGroup(new PrototypeMap(context));
-        var child2 = child1a.newGroup(new PrototypeMap(context));
-        var child3 = child2.newGroup(new PrototypeMap(context));
+        var child1a = watchGrp.createChild(new PrototypeMap(context));
+        var child1b = watchGrp.createChild(new PrototypeMap(context));
+        var child2 = child1a.createChild(new PrototypeMap(context));
+        var child3 = child2.createChild(new PrototypeMap(context));
         child1a.watch(countMethod, (v, p) => logger('1a'));
         expectOrder(['0a', '1a']);
         child1b.watch(countMethod, (v, p) => logger('1b'));
@@ -916,7 +916,7 @@ void main() {
         context['my'] = new MyClass(logger);
         AST countMethod = new MethodAST(parse('my'), 'count', []);
         var ra = watchGrp.watch(countMethod, (v, p) => logger('a'));
-        var child = watchGrp.newGroup(new PrototypeMap(context));
+        var child = watchGrp.createChild(new PrototypeMap(context));
         var cb = child.watch(countMethod, (v, p) => logger('b'));
 
         expectOrder(['a', 'b']);
@@ -938,7 +938,7 @@ void main() {
       it('should not call reaction function on removed group', () {
         var log = [];
         context['name'] = 'misko';
-        var child = watchGrp.newGroup(context);
+        var child = watchGrp.createChild(context);
         watchGrp.watch(parse('name'), (v, _) {
           log.add('root $v');
           if (v == 'destroy') {
@@ -963,7 +963,7 @@ void main() {
         context['b'] = 'BAD';
         childContext['b'] = 'OK';
         watchGrp.watch(parse('a'), (v, p) => logger(v));
-        watchGrp.newGroup(childContext).watch(parse('b'), (v, p) => logger(v));
+        watchGrp.createChild(childContext).watch(parse('b'), (v, p) => logger(v));
 
         watchGrp.detectChanges();
         expect(logger).toEqual(['OK', 'OK']);

@@ -47,6 +47,7 @@ class _ExpressionVisitor implements syntax.Visitor {
   AST visit(syntax.Expression exp) => exp.accept(this);
 
   AST visitCollection(syntax.Expression exp) => new CollectionAST(visit(exp));
+
   AST _mapToAst(syntax.Expression expression) => visit(expression);
 
   List<AST> _toAst(List<syntax.Expression> expressions) =>
@@ -66,16 +67,16 @@ class _ExpressionVisitor implements syntax.Visitor {
     Map<Symbol, AST> named = _toAstMap(exp.arguments.named);
     return new MethodAST(contextRef, exp.name, positionals, named);
   }
+
   AST visitCallMember(syntax.CallMember exp) {
     List<AST> positionals = _toAst(exp.arguments.positionals);
     Map<Symbol, AST> named = _toAstMap(exp.arguments.named);
     return new MethodAST(visit(exp.object), exp.name, positionals, named);
   }
-  AST visitAccessScope(syntax.AccessScope exp) =>
-      new FieldReadAST(contextRef, exp.name);
 
-  AST visitAccessMember(syntax.AccessMember exp) =>
-      new FieldReadAST(visit(exp.object), exp.name);
+  AST visitAccessScope(syntax.AccessScope exp) => new FieldReadAST(contextRef, exp.name);
+
+  AST visitAccessMember(syntax.AccessMember exp) => new FieldReadAST(visit(exp.object), exp.name);
 
   AST visitBinary(syntax.Binary exp) =>
       new PureFunctionAST(exp.operation,
@@ -89,18 +90,14 @@ class _ExpressionVisitor implements syntax.Visitor {
 
   AST visitConditional(syntax.Conditional exp) =>
       new PureFunctionAST('?:', _operation_ternary,
-                          [visit(exp.condition), visit(exp.yes),
-                          visit(exp.no)]);
+                          [visit(exp.condition), visit(exp.yes), visit(exp.no)]);
 
   AST visitAccessKeyed(syntax.AccessKeyed exp) =>
-      new ClosureAST('[]', _operation_bracket,
-                     [visit(exp.object), visit(exp.key)]);
+      new ClosureAST('[]', _operation_bracket, [visit(exp.object), visit(exp.key)]);
 
-  AST visitLiteralPrimitive(syntax.LiteralPrimitive exp) =>
-      new ConstantAST(exp.value);
+  AST visitLiteralPrimitive(syntax.LiteralPrimitive exp) => new ConstantAST(exp.value);
 
-  AST visitLiteralString(syntax.LiteralString exp) =>
-      new ConstantAST(exp.value);
+  AST visitLiteralString(syntax.LiteralString exp) => new ConstantAST(exp.value);
 
   AST visitLiteralArray(syntax.LiteralArray exp) {
     List<AST> items = _toAst(exp.elements);
@@ -133,20 +130,24 @@ class _ExpressionVisitor implements syntax.Visitor {
   void visitCallFunction(syntax.CallFunction exp) {
     _notSupported("function's returing functions");
   }
+
   void visitAssign(syntax.Assign exp) {
     _notSupported('assignement');
   }
+
   void visitLiteral(syntax.Literal exp) {
     _notSupported('literal');
   }
+
   void visitExpression(syntax.Expression exp) {
     _notSupported('?');
   }
+
   void visitChain(syntax.Chain exp) {
     _notSupported(';');
   }
 
-  void  _notSupported(String name) {
+  void _notSupported(String name) {
     throw new StateError("Can not watch expression containing '$name'.");
   }
 }
@@ -205,7 +206,7 @@ _operation_bracket(obj, key) {
 
 class ArrayFn extends FunctionApply {
   // TODO(misko): figure out why do we need to make a copy?
-  apply(List args) => new List.from(args);
+  List apply(List args) => new List.from(args);
 }
 
 class MapFn extends FunctionApply {
