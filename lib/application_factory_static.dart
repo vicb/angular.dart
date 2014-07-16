@@ -11,15 +11,9 @@
  *     import 'package:angular/angular.dart';
  *     import 'package:angular/application_factory_static.dart';
  *
- *     class MyModule extends Module {
- *       MyModule() {
- *         bind(HelloWorldController);
- *       }
- *     }
- *
  *     main() {
  *       staticApplicationFactory()
- *           .addModule(new MyModule())
+ *           .rootContextType(HelloWorldController)
  *           .run();
  *     }
  *
@@ -52,7 +46,8 @@ class _StaticApplication extends Application {
     ngModule
         ..bind(MetadataExtractor, toValue: new StaticMetadataExtractor(metadata))
         ..bind(FieldGetterFactory, toValue: new StaticFieldGetterFactory(fieldGetters))
-        ..bind(ClosureMap, toValue: new StaticClosureMap(fieldGetters, fieldSetters, symbols));
+        ..bind(ClosureMap, toFactory: (_) =>
+            new StaticClosureMap(fieldGetters, fieldSetters, symbols));
   }
 }
 
@@ -67,7 +62,7 @@ class _StaticApplication extends Application {
  *
  *     main() {
  *       applicationFactory()
- *       .addModule(new Module()..bind(HelloWorld))
+ *       .rootContextType(HelloWorld)
  *       .run();
  *       }
  *
@@ -79,7 +74,7 @@ class _StaticApplication extends Application {
  *           generated_static_expressions.getters,
  *           generated_static_expressions.setters,
  *           generated_static_expressions.symbols)
- *         .addModule(new Module()..bind(HelloWorldController))
+ *         .rootContextType(HelloWorld)
  *         .run();
  *
  */
