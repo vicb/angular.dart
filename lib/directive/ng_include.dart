@@ -23,25 +23,21 @@ class NgInclude {
   final dom.Element element;
   final Scope scope;
   final ViewCache viewCache;
-  final Injector appInjector;
   final DirectiveInjector directiveInjector;
   final DirectiveMap directives;
 
   View _view;
-  Scope _scope;
+  Scope _childScope;
 
-  NgInclude(this.element, this.scope, this.viewCache,
-            this.directiveInjector, this.appInjector, this.directives);
+  NgInclude(this.element, this.scope, this.viewCache, this.directiveInjector, this.directives);
 
   _cleanUp() {
     if (_view == null) return;
-
     _view.nodes.forEach((node) => node.remove);
-    _scope.destroy();
+    _childScope.destroy();
+    _childScope = null;
     element.innerHtml = '';
-
     _view = null;
-    _scope = null;
   }
 
   _updateContent(ViewFactory viewFactory) {
@@ -51,7 +47,6 @@ class NgInclude {
 
     _view.nodes.forEach((node) => element.append(node));
   }
-
 
   set url(value) {
     _cleanUp();

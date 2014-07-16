@@ -6,7 +6,7 @@ abstract class DirectiveBinder {
   bind(key, {Function toFactory, inject, Visibility visibility: Visibility.CHILDREN});
 }
 
-typedef void DirectiveBinderFn(DirectiveBinder module);
+typedef void DirectiveBinderFn(DirectiveBinder binder);
 
 RegExp _ATTR_NAME = new RegExp(r'\[([^\]]+)\]$');
 
@@ -31,18 +31,18 @@ class Visibility {
 abstract class Directive {
 
   /// The directive can only be injected to other directives on the same element.
-  @deprecated // ('Use Visibility.LOCAL instead')
+  @Deprecated('Use Visibility.LOCAL instead')
   static const Visibility LOCAL_VISIBILITY = Visibility.LOCAL;
 
   /// The directive can be injected to other directives on the same or child elements.
-  @deprecated// ('Use Visibility.CHILDREN instead')
+  @Deprecated('Use Visibility.CHILDREN instead')
   static const Visibility CHILDREN_VISIBILITY = Visibility.CHILDREN;
 
   /**
    * The directive on this element can only be injected to other directives
    * declared on elements which are direct children of the current element.
    */
-  @deprecated// ('Use Visibility.DIRECT_CHILD instead')
+  @Deprecated('Use Visibility.DIRECT_CHILD instead')
   static const Visibility DIRECT_CHILDREN_VISIBILITY = Visibility.DIRECT_CHILD;
 
   /**
@@ -90,26 +90,22 @@ abstract class Directive {
   static const String IGNORE_CHILDREN = 'ignore';
 
   /**
-   * A directive/component controller class can be injected into other
-   * directives/components. This attribute controls whether the
-   * controller is available to others.
+   * A directive/component controller class can be injected into other directives/components. This
+   * attribute controls whether the controller is available to others.
    *
-   * * `local` [Directive.LOCAL_VISIBILITY] - the controller can be injected
-   *   into other directives / components on the same DOM element.
-   * * `children` [Directive.CHILDREN_VISIBILITY] - the controller can be
-   *   injected into other directives / components on the same or child DOM
-   *   elements.
-   * * `direct_children` [Directive.DIRECT_CHILDREN_VISIBILITY] - the
-   *   controller can be injected into other directives / components on the
-   *   direct children of the current DOM element.
+   * * [Visibility.LOCAL] - the controller can be injected into other directives / components on the
+   *   same DOM element.
+   * * [Visibility.CHILDREN] - the controller can be injected into other directives / components on
+   *   the same or child DOM elements.
+   * * [Visibility.DIRECT_CHILD] - the controller can be injected into other directives / components
+   *   on the direct children of the current DOM element.
    */
   final Visibility visibility;
 
   /**
-   * A directive/component class can publish types by using a factory
-   * function to generate a module. The module is then installed into
-   * the injector at that element. Any types declared in the module then
-   * become available for injection.
+   * A directive/component class can publish types by using a factory function to generate a module.
+   * The module is then installed into the injector at that element. Any types declared in the
+   * module then become available for injection.
    *
    * Example:
    *
@@ -121,11 +117,10 @@ abstract class Directive {
    *          binder.bind(SomeTypeA, visibility: Directive.LOCAL_VISIBILITY);
    *     }
    *
-   * When specifying types, factories or values in the module, notice that
-   * `Visibility` maps to:
-   *  * [Directive.LOCAL_VISIBILITY]
-   *  * [Directive.CHILDREN_VISIBILITY]
-   *  * [Directive.DIRECT_CHILDREN_VISIBILITY]
+   * `visibility` is one of:
+   *  * [Visibility.LOCAL]
+   *  * [Visibility.CHILDREN] (default)
+   *  * [Visibility.DIRECT_CHILD]
    */
   final DirectiveBinderFn module;
 
@@ -263,10 +258,8 @@ class Component extends Directive {
   /**
    * Set the shadow root applyAuthorStyles property. See shadow-DOM
    * documentation for further details.
-   *
-   * This feature will be removed in Chrome 35.
    */
-  @deprecated
+  @Deprecated('in Chrome 35')
   bool get applyAuthorStyles {
     if (!_applyAuthorStylesDeprecationWarningPrinted && _applyAuthorStyles == true) {
       print("WARNING applyAuthorStyles is deprecated in component $selector");
@@ -279,10 +272,8 @@ class Component extends Directive {
   /**
    * Set the shadow root resetStyleInheritance property. See shadow-DOM
    * documentation for further details.
-   *
-   * This feature will be removed in Chrome 35.
    */
-  @deprecated
+  @Deprecated('in Chrome 35')
   bool get resetStyleInheritance {
     if (!_resetStyleInheritanceDeprecationWarningPrinted && _resetStyleInheritance == true) {
       print("WARNING resetStyleInheritance is deprecated in component $selector");
