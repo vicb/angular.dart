@@ -65,24 +65,24 @@ main() {
 
     describe('camelCase', () {
       it('should camelCase', () {
-        expect(_case.camel('foo')).toEqual('foo');
-        expect(_case.camel('foo-bar')).toEqual('fooBar');
-        expect(_case.camel('foo--bar')).toEqual('fooBar');
-        expect(_case.camel('foo-bar-baz')).toEqual('fooBarBaz');
+        expect(_case.toCamel('foo')).toEqual('foo');
+        expect(_case.toCamel('foo-bar')).toEqual('fooBar');
+        expect(_case.toCamel('foo--bar')).toEqual('fooBar');
+        expect(_case.toCamel('foo-bar-baz')).toEqual('fooBarBaz');
       });
 
       it('should camelCase exceptions', () {
-        expect(_case.camel('read-only')).toEqual('readOnly');
-        expect(_case.camel('readonly')).toEqual('readOnly');
+        expect(_case.toCamel('read-only')).toEqual('readOnly');
+        expect(_case.toCamel('readonly')).toEqual('readOnly');
       });
 
       it('should dashCase', () {
-        expect(_case.dash('bar')).toEqual('bar');
-        expect(_case.dash('innerHTML')).toEqual('inner-html');
+        expect(_case.toDash('bar')).toEqual('bar');
+        expect(_case.toDash('innerHTML')).toEqual('inner-html');
       });
 
       it('should dashCase exceptions', () {
-        expect(_case.dash('readOnly')).toEqual('readonly');
+        expect(_case.toDash('readOnly')).toEqual('readonly');
       });
     });
 
@@ -132,8 +132,7 @@ main() {
       });
 
       it('should bind to non-existant property', () {
-        setup(inputElement, attrs: {'bind-dont-exist': 'text'});
-        // should not throw
+        expect(() => setup(inputElement, attrs: {'bind-dont-exist': 'text'})).not.toThrow();
       });
     });
 

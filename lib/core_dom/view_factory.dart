@@ -10,9 +10,10 @@ part of angular.core.dom_internal;
  * The BoundViewFactory needs [Scope] to be created.
  */
 class BoundViewFactory {
+  final ViewFactory viewFactory;
+  final Injector injector;
+
   static Function factory = (Injector injector) => injector.get(ViewFactory).bind(injector);
-  ViewFactory viewFactory;
-  Injector injector;
 
   BoundViewFactory(this.viewFactory, this.injector);
 

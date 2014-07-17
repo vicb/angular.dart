@@ -75,11 +75,9 @@ class DirectiveSelector {
     _elementSelector.selectNode(directives, partialSelection, nodeName);
 
     // Select .name
-    if ((element.classes) != null) {
-      for (var name in element.classes) {
-        classes.add(name);
-        _elementSelector.selectClass(directives, partialSelection, name);
-      }
+    for (var name in element.classes) {
+      classes.add(name);
+      _elementSelector.selectClass(directives, partialSelection, name);
     }
 
     // Select [attributes]
@@ -226,11 +224,9 @@ class _ElementSelector {
     }
   }
 
-
-
-  selectNode(Map<Type, Directive> directives,
-             List<_ElementSelector> partialSelection,
-             String nodeName) {
+  void selectNode(Map<Type, Directive> directives,
+                  List<_ElementSelector> partialSelection,
+                  String nodeName) {
     if (elementMap.containsKey(nodeName)) {
       directives.addAll(elementMap[nodeName]);
     }
@@ -239,9 +235,9 @@ class _ElementSelector {
     }
   }
 
-  selectClass(Map<Type, Directive> directives,
-              List<_ElementSelector> partialSelection,
-              String className) {
+  void selectClass(Map<Type, Directive> directives,
+                   List<_ElementSelector> partialSelection,
+                   String className) {
     if (classMap.containsKey(className)) {
       directives.addAll(classMap[className]);
     }
@@ -250,10 +246,10 @@ class _ElementSelector {
     }
   }
 
-  selectAttr(Map<Type, Directive> directives,
-             List<_ElementSelector> partialSelection,
-             String attrName,
-             String attrValue) {
+  void selectAttr(Map<Type, Directive> directives,
+                  List<_ElementSelector> partialSelection,
+                  String attrName,
+                  String attrValue) {
 
     Map<String, Map<Type, Directive>> valuesMap = attrValueMap[attrName];
     if (valuesMap != null) {
@@ -275,7 +271,7 @@ class _ElementSelector {
     }
   }
 
-  toString() => 'ElementSelector($name)';
+  String toString() => 'ElementSelector($name)';
 }
 
 var _SELECTOR_REGEXP = new RegExp(

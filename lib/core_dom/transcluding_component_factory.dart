@@ -12,7 +12,7 @@ class Content implements AttachAware, DetachAware {
     if (_port == null) return;
     _beginComment = _port.content(_element);
   }
-  
+
   void detach() {
     if (_port == null) return;
     _port.detachContent(_beginComment);
@@ -96,7 +96,6 @@ class TranscludingComponentFactory implements ComponentFactory {
         elementFuture = new async.Future.microtask(() => contentPort.pullNodes());
       }
       TemplateLoader templateLoader = new TemplateLoader(elementFuture);
-
 
       var probe;
       var childModule = new Module()

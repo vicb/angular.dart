@@ -3,7 +3,7 @@ part of angular.directive;
 /**
  * The ngHide directive shows or hides the given HTML element based on the
  * expression provided to the ngHide attribute. The element is shown or hidden
- * by changing the removing or adding the ng-hide CSS class onto the element.
+ * by changing the removing or adding the `ng-hide` CSS class onto the element.
  */
 @Decorator(
     selector: '[ng-hide]',
@@ -12,12 +12,11 @@ part of angular.directive;
 class NgHide {
   static String NG_HIDE_CLASS = 'ng-hide';
 
-  final dom.Element element;
-  final Animate animate;
+  final NgElement element;
 
-  NgHide(this.element, this.animate);
+  NgHide(this.element);
 
-  set hide(value) {
+  void set hide(value) {
     if (toBool(value)) {
       element.addClass(NgHide.NG_HIDE_CLASS);
     } else {
@@ -29,7 +28,7 @@ class NgHide {
 /**
  * The ngShow directive shows or hides the given HTML element based on the
  * expression provided to the ngHide attribute. The element is shown or hidden
- * by changing the removing or adding the ng-hide CSS class onto the element.
+ * by changing the removing or adding the `ng-hide` CSS class onto the element.
  */
 @Decorator(
     selector: '[ng-show]',
@@ -40,7 +39,7 @@ class NgShow {
 
   NgShow(this.element);
 
-  set show(value) {
+  void set show(value) {
     if (toBool(value)) {
       element.removeClass(NgHide.NG_HIDE_CLASS);
     } else {

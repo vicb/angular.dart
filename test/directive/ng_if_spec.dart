@@ -15,26 +15,20 @@ class ChildController {
 }
 
 main() {
-  var compile, html, element, rootScope, logger, directives;
+  var compile, html, element, rootScope, logger;
 
   void configInjector(Module module) {
     module..bind(ChildController)
           ..bind(LogAttrDirective);
   }
 
-  void configState(Scope scope, Compiler compiler, Injector injector,
-                   Logger _logger, DirectiveMap _directives) {
+  void configState(Scope scope, Logger _logger, TestBed tb) {
     rootScope = scope;
     logger = _logger;
-    compile = (html, [applyFn]) {
-      element = e(html);
-      compiler([element], _directives, compileInPlace: true)(injector, scope);
-      scope.apply(applyFn);
-    };
-    directives = _directives;
+    compile = tb.compile;
   }
 
-  they(should, htmlForElements, callback, [exclusive=false]) {
+  they(should, htmlForElements, callback, [exclusive = false]) {
     htmlForElements.forEach((html) {
       var directiveName = html.contains('ng-if') ? 'ng-if' : 'ng-unless';
       describe(directiveName, () {

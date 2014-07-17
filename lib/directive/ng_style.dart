@@ -10,7 +10,7 @@ part of angular.directive;
 @Decorator(
     selector: '[ng-style]',
     canChangeModel: false,
-    bind: const {'ng-style': 'styleExpression'})
+    bind: const {'ngStyle': 'styleExpression'})
 class NgStyle {
   final dom.Element _element;
   final Scope _scope;

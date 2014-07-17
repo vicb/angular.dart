@@ -1,7 +1,7 @@
 part of angular.core.dom_internal;
 
 abstract class OnEvent {
-  fire(String name, [dynamic data]);
+  void fire(String name, [data]);
 }
 
 @Injectable()
@@ -40,7 +40,7 @@ class NgElement implements OnEvent {
     _attributesToUpdate[attrName] = _TO_BE_REMOVED;
   }
 
-  fire(String name, [dynamic data]) {
+  void fire(String name, [data]) {
     _eventHandler.fire(node, name, data);
   }
 

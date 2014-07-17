@@ -364,6 +364,8 @@ class Scope {
     }
     return counts;
   }
+
+  String toString() => "[Scope] <root>$id";
 }
 
 _mapEqual(Map a, Map b) => a.length == b.length &&
@@ -813,6 +815,8 @@ class RootScope extends Scope {
     if (_state != from) throw "$_state already in progress can not enter $to.";
     _state = to;
   }
+
+  String toString() => "[RootScope]";
 }
 
 /**

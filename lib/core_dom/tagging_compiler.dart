@@ -93,38 +93,40 @@ class TaggingCompiler implements Compiler {
     return viewFactory;
   }
 
-  _treeShakeBinders(List<NodeBinder> binders, {bool compileInPlace: false}) {
-    assert(binders.length > 0);
+  List<NodeBinder> _treeShakeBinders(List<NodeBinder> binders, {bool compileInPlace: false}) {
+    assert(binders.isNotEmpty);
     final rootBinder = binders[0]; // This one is special;
     const NO_PARENT = -1;
     // In order to support text nodes with directiveless parents, we
     // add dummy NodeBinders to the list.  After the entire template
     // has been compiled, we remove the dummies and update the offset indices
-    /*
-     0: -- Root(-1)
-     1:  +- A (0)
-     2:   +- B (1)
-
-     Let's assume only B needs to stay
-     [-1, -1, 0]
-
-     */
+    //
+    // Index      (Parent index)
+    // 0: -- Root  (-1)
+    // 1:  +-- A   (0)
+    // 2:    +-- B (1)
+    //
+    // Let's assume only B needs to stay (B is not empty)
+    // parentIndexes = [-1, -1, 0]
+    // output = [B]
     final output = <NodeBinder>[rootBinder];
-    final parentForward = new List<int>(binders.length + 1);
-    parentForward[0] = compileInPlace ? 0 : NO_PARENT;
-    int outputIndex = 1;
+    // todo(vicb) check: removed +1 to length ?
+    final parentIndexes = new List<int>(binders.length);
+    parentIndexes[0] = compileInPlace ? 0 : NO_PARENT;
+    int dstIndex = 1;
 
-    for (var i = 1, ii = binders.length; i < ii; i++) {
-      NodeBinder binder = binders[i];
+    for (var srcIndex = 1; srcIndex <  binders.length; srcIndex++) {
+      NodeBinder binder = binders[srcIndex];
       if (binder.isEmpty) {
-        parentForward[i] = parentForward[binder.parentBinderOffset];
+        // The binder is empty and will be removed, set the parent to the parent's parent
+        parentIndexes[srcIndex] = parentIndexes[binder.parentIndex];
       } else {
-        binder.parentBinderOffset = parentForward[binder.parentBinderOffset];
+        binder.parentIndex = parentIndexes[binder.parentIndex];
         output.add(binder);
-        parentForward[i] = outputIndex++;
+        parentIndexes[srcIndex] = dstIndex++;
       }
     }
-    assert(output.length > 0);
+    assert(output.isNotEmpty);
     assert(output[0] == rootBinder);
     return output;
   }

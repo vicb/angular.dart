@@ -420,7 +420,7 @@ class Controller extends Decorator {
  */
 class Bind {
   final String nodeProperty;
-  const Bind([this.nodeProperty = null]);
+  const Bind([this.nodeProperty]);
 }
 
 /**

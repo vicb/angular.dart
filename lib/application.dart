@@ -123,7 +123,7 @@ class AngularModule extends Module {
  *
  */
 abstract class Application {
-  static _find(String selector, [dom.Element defaultElement]) {
+  static dom.Element _find(String selector, [dom.Element defaultElement]) {
     var element = dom.document.querySelector(selector);
     if (element == null) element = defaultElement;
     if (element == null) {
@@ -142,7 +142,7 @@ abstract class Application {
    */
   dom.Element selector(String selector) => element = _find(selector);
 
-  Application(): element = _find('[ng-app]', _find('body', null)) {
+  Application(): element = _find('[ng-app]', _find('body')) {
     modules.add(ngModule);
     ngModule..bind(VmTurnZone, toValue: zone)
             ..bind(Application, toValue: this)

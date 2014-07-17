@@ -113,8 +113,8 @@ class NodeBinderBuilder {
     bindings.forEach((String propertyName, String propertyBindExp) {
       var match = _CHILD.firstMatch(propertyName);
       if (match != null) {
-        var childIndex = int.parse(match.group(1));
-        propertyName = _case.camel(match.group(2));
+        var childIndex = int.parse(match[1]);
+        propertyName = _case.camel(match[2]);
         if (childNodes == null) childNodes = templateElement.childNodes;
         if (childIndex < childNodes.length) {
           childNodePropertyBinders.length = childIndex + 1; // make sure that we have right length
@@ -162,7 +162,7 @@ class NodeBinderBuilder {
     var nodeBinder = new NodeBinder(
         templateElement,
         nodeChangeEvents,
-        onEvents.map((n) => _case.camel(n)).toList(),
+        onEvents.map(_case.camel).toList(),
         nodePropertyBinders.values.toList(),
         childNodePropertyBinders,
         directiveTypes,
@@ -285,7 +285,7 @@ class NodeBinderBuilder {
         propertyBindExp == null ? null : setter(_parse(propertyBindExp)));
   }
 
-  _isTransclusionDirective(Directive annotation) =>
+  bool _isTransclusionDirective(Directive annotation) =>
       annotation.children == Directive.TRANSCLUDE_CHILDREN;
 
   _parse(String exp) => _parser(exp.replaceAll(_PREFIX, ''));
@@ -342,9 +342,9 @@ class NodeBinder {
     isEmpty = false;
   }
 
-  get isNotEmpty => !isEmpty;
+  bool get isNotEmpty => !isEmpty;
 
-  addChildTextInterpolation(int index, String interpolation) {
+  void addChildTextInterpolation(int index, String interpolation) {
     if (templateElement != null) {
       templateElement.attributes['bind-$index-text'] = interpolation;
       if (isEmpty) templateElement.classes.add(NG_BINDING);
@@ -381,7 +381,7 @@ class NodeBinder {
       eventHandler.register(onEvent);
     }
     // TODO(misko): use EventHandler for this;
-    //events.forEach((e) => element.node.addEventListener(e, (e) => nodeBindings.check(true)));
+    events.forEach((e) => element.node.addEventListener(e, (e) => nodeBindings.check(true)));
     return nodeBindings;
   }
 
@@ -560,7 +560,7 @@ class NodePropertyBinding implements FlushAware {
     }
   }
 
-  flush() {
+  void flush() {
     _currentValue = _newValue;
     if (binder.property == 'className') {
       _toSet(_lastValue).forEach(element.removeClass);
@@ -641,13 +641,13 @@ class DirectivePropertyBinding implements FlushAware {
 
   /// Notify binding of a change to value. This change could come from [Watch] or from
   /// [NodePropertyBinding]
-  setValue(value, lastValue) {
+  void setValue(value, lastValue) {
     _newValue = value;
     _lastValue = lastValue;
     _flushQueue.schedule();
   }
 
-  flush() {
+  void flush() {
     if (same(_currentValue, _newValue)) return;
     if (binder.setter != null) binder.setter(directive, _currentValue = _newValue);
     if (reactionFn != null) reactionFn(_newValue, _lastValue);
@@ -655,28 +655,34 @@ class DirectivePropertyBinding implements FlushAware {
 }
 
 abstract class FlushAware {
-  flush();
+  void flush();
 }
+
 
 class FlushQueue {
   final RootScope rootScope;
   final FlushAware flushAware;
   final bool immediate;
+
   bool _isPending = false;
   Function _flushFn;
 
+  /// if [_immediate] is true, then `_flushAware.flush()` will be executed at the first time
+  /// the queue is triggered (during the first following flush phase). When [_immediate] is false
+  /// `flush()` will be delayed until the next flush phase
   FlushQueue(this.flushAware, this.rootScope, this.immediate) {
     _flushFn = () {
       _isPending = false;
       flushAware.flush();
     };
   }
-  
+
   void schedule() {
     if (immediate) {
       _flushFn();
     } else if (!_isPending) {
       rootScope.domWrite(_flushFn);
+      _isPending = true;
     }
   }
 }

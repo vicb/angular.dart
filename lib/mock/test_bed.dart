@@ -13,7 +13,7 @@ class TestBed {
   final Parser _parser;
   final Expando expando;
 
-  Element get rootElement => rootElements.length > 0 ? rootElements[0] : null;
+  Element get rootElement => rootElements.isNotEmpty ? rootElements[0] : null;
   List<Node> rootElements;
   View rootView;
 
