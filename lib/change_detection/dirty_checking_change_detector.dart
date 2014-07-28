@@ -131,6 +131,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
     var root;
     assert((root = _root) != null);
     assert(root._assertRecordsOk());
+    _removeChildNotifiers();
     // Unlink this group records
     DirtyCheckingRecord prevRecord = _recordHead._prev;
     var childInclRecordTail = _recordTailInclChildren;
@@ -179,6 +180,7 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
   }
 
   void _removeRecord(DirtyCheckingRecord record) {
+    _removeNotifier(record);
     DirtyCheckingRecord previous = record._prev;
     DirtyCheckingRecord next = record._next;
 
@@ -196,6 +198,34 @@ class DirtyCheckingChangeDetectorGroup<H> implements ChangeDetectorGroup<H> {
       if (next != null) next._prev = previous;
     }
   }
+
+  void _registerNotifier(DirtyCheckingRecord<H> record, ChangeNotifier notifier) {
+    if (_notifiers == null) _notifiers = new HashMap.identity();
+    assert(!_notifier.containsKey(record));
+    _notifiers[record] = notifier;
+  }
+
+  void _removeNotifier(DirtyCheckingRecord<H> record) {
+    if (_notifiers == null) return;
+    var notifier = _notifiers.remove(record);
+    if (notifier != null) notifier.remove();
+  }
+
+  void _removeOwnNotifiers() {
+    if (_notifiers != null) {
+      _notifiers.values.forEach((n) => n.remove());
+      _notifiers = null;
+    }
+  }
+
+  void _removeChildNotifiers() {
+    this._cancelOwnNotifiers();
+    for (var child = _childHead; child != null; child = child._next) {
+      child._cancelOwnNotifiers();
+    }
+  }
+
+  void getNotifier(DirtyCheckingRecord<H> record) => _notifiers = null ? null : _notifiers[record];
 
   String toString() {
     var lines = [];
@@ -409,6 +439,25 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
    */
   void set object(obj) {
     _object = obj;
+
+    // Get the current change notifier
+    var changeNotifier = _group.getNotifier(this);
+    if (!changeNotifier.canNotify(obj, field)) {
+      _group.removeNotifier(this, changeNotifier);
+      changeNotifier = null;
+    }
+
+    // Try to find a change observer is none is currently set up
+    if (changeNotifier == null) {
+      for (plugin in plugins) {
+        var changeNotifier = plugin.getChangeNotifier(obj, field, this);
+        if (changeNotifier != null) {
+          _group.registerNotifier(this, changeNotifier);
+          break;
+        }
+      }
+    }
+
     if (obj == null) {
       _mode = _MODE_IDENTITY_;
       _getter = null;
@@ -418,8 +467,7 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
     if (field == null) {
       _getter = null;
       if (obj is Map) {
-        if (_mode != _MODE_MAP_) {
-          _mode =  _MODE_MAP_;
+        if (currentValue is! _MapChangeRecord) {
           currentValue = new _MapChangeRecord();
         }
         if (currentValue.isDirty) {
@@ -429,10 +477,9 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
           // new reference.
           currentValue._revertToPreviousState();
         }
-
+        _mode = changeNotifier == null ? _MODE_MAP : _MODE_MAP_NOTIFIED;
       } else if (obj is Iterable) {
-        if (_mode != _MODE_ITERABLE_) {
-          _mode = _MODE_ITERABLE_;
+        if (_mode is! _CollectionChangeRecord) {
           currentValue = new _CollectionChangeRecord();
         }
         if (currentValue.isDirty) {
@@ -442,6 +489,7 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
           // new reference.
           currentValue._revertToPreviousState();
         }
+        _mode = changeNotifier == null ? _MODE_LIST : _MODE_LIST_NOTIFIED;
       } else {
         _mode = _MODE_IDENTITY_;
       }
@@ -453,7 +501,9 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
       _mode =  _MODE_MAP_FIELD_;
       _getter = null;
     } else {
-      _mode = _MODE_GETTER_OR_METHOD_CLOSURE_;
+      _mode = changeNotifier == null ?
+          _MODE_GETTER_OR_METHOD_CLOSURE:
+          _MODE_GETTER_NOTIFIED_;
       _getter = _fieldGetterFactory.getter(obj, field);
     }
   }
@@ -493,8 +543,32 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
         return (currentValue as _MapChangeRecord)._check(object);
       case _MODE_ITERABLE_:
         return (currentValue as _CollectionChangeRecord)._check(object);
+
+      case _MODE_MAP_NOTIFIED_:
+        _mode = _MODE_NOOP_; // no-op until next notification
+        return (currentValue as _MapChangeRecord)._check(object);
+      case _MODE_LIST_NOTIFIED_:
+        _mode = _MODE_NOOP_; // no-op until next notification
+        return (currentValue as _CollectionChangeRecord)._check(object);
+      case _MODE_GETTER_NOTIFIED_:
+        _mode = _MODE_NOOP_; // no-op until next notification
+        current = _getter(object);
+        break;
+
       default:
         assert(false);
+    }
+
+    void notifyFieldChange() {
+      _mode = _MODE_GETTER_NOTIFIED_;
+    }
+
+    void notifyListChange() {
+      _mode = _MODE_LIST_NOTIFIED_;
+    }
+
+    void notifyMapChange() {
+      _mode = _MODE_MAP_NOTIFIED_;
     }
 
     var last = currentValue;
@@ -514,6 +588,29 @@ class DirtyCheckingRecord<H> implements WatchRecord<H> {
   String toString() =>
       '${_mode < _MODE_NAMES.length ?  _MODE_NAMES[_mode] : '?'}[$field]{$hashCode}';
 }
+
+abstract class Plugin {
+  /**
+   * Returns a [ChangeNotifier] able to asynchronously notify
+   * changes for the [field] property on the [object] or `null`
+   */
+  ChangeNotifier getChangeNotifier(Object object,
+                                   String field,
+                                   DirtyCheckingRecord record);
+}
+
+abstract class ChangeNotifier {
+  /**
+   * Whether this change notifier can notify the field
+   * property changes on object
+   */
+  bool canNotify(Object object, String field);
+
+  /// Cleanup (unsubscribe listeners)
+  void remove();
+}
+
+
 
 class _MapChangeRecord<K, V> implements MapChangeRecord<K, V> {
   final _records = new HashMap<dynamic, KeyValueRecord>();
