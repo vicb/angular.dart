@@ -29,9 +29,8 @@ done
 
 
 install_deps() {(
-  SELENIUM_VER="2.42"
-  SELENIUM_ZIP="selenium-server-standalone-$SELENIUM_VER.0.jar"
-  CHROMEDRIVER_VER="2.10"
+
+  SELENIUM_ZIP="selenium-server-standalone-$SELENIUM_VERSION.0.jar"
   # chromedriver
   case "$(uname -s)" in
     (Darwin) CHROMEDRIVER_ZIP="chromedriver_mac32.zip" ;;
@@ -40,10 +39,10 @@ install_deps() {(
   esac
   mkdir -p e2e_bin && cd e2e_bin
   if [[ ! -e "$SELENIUM_ZIP" ]]; then
-    curl -O "http://selenium-release.storage.googleapis.com/$SELENIUM_VER/$SELENIUM_ZIP"
+    curl -O "http://selenium-release.storage.googleapis.com/$SELENIUM_VERSION/$SELENIUM_ZIP"
   fi
   if [[ ! -e "$CHROMEDRIVER_ZIP" ]]; then
-    curl -O "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VER/$CHROMEDRIVER_ZIP"
+    curl -O "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/$CHROMEDRIVER_ZIP"
     unzip "$CHROMEDRIVER_ZIP"
   fi
 )}
@@ -51,7 +50,7 @@ install_deps() {(
 
 start_servers() {
   # Run examples.
-  ( 
+  (
     cd example
     pub install
     pub build
