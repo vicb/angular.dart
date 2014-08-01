@@ -175,11 +175,7 @@ void main() {
         microLeap();
         backend.flush();
         microLeap();
-        expect(element.first).toHaveText(
-            '/*\n'
-            'HTTP 500: some error\n'
-            '*/\n'
-            'inline!');
+        expect(element.first).toHaveText('/*HTTP 500: some error*/inline!');
       }));
 
       it('should load a CSS with no template', async(
