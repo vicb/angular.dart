@@ -46,7 +46,8 @@ void main() => describe('annotations', () {
         visibility: Visibility.LOCAL,
         exportExpressions: [],
         exportExpressionAttrs: [],
-        useShadowDom: true
+        useShadowDom: true,
+        publishAs: ''
       );
 
       // Check that no fields are null

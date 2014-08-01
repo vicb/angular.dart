@@ -218,6 +218,30 @@ bool _resetStyleInheritanceDeprecationWarningPrinted = false;
  */
 class Component extends Directive {
   /**
+   * This property is left here for backward compatibility
+   *
+   * Before:
+   *
+   *     @Component(publishAs: 'ctrl', ...)
+   *     class MyComponent {
+   *       // ...
+   *     }
+   *
+   * After:
+   *
+   *    @Component(publishAs: 'ctrl', ...)
+   *     class MyComponent {
+   *       // You must add a getter named after the publishAs configuration
+   *       MyComponent get ctrl => this;
+   *
+   *       // ...
+   *     }
+   */
+  @Deprecated('next release. This property is left for backward compatibility but setting it has no'
+              'effect')
+  final String publishAs;
+
+  /**
    * Inlined HTML template for the component.
    */
   final String template;
@@ -286,7 +310,8 @@ class Component extends Directive {
     exportExpressions,
     exportExpressionAttrs,
     this.useShadowDom,
-    this.useNgBaseCss: true})
+    this.useNgBaseCss: true,
+    this.publishAs})
       : _cssUrls = cssUrl,
         _applyAuthorStyles = applyAuthorStyles,
         _resetStyleInheritance = resetStyleInheritance,
@@ -316,7 +341,8 @@ class Component extends Directive {
           exportExpressions: exportExpressions,
           exportExpressionAttrs: exportExpressionAttrs,
           useShadowDom: useShadowDom,
-          useNgBaseCss: useNgBaseCss);
+          useNgBaseCss: useNgBaseCss,
+          publishAs: publishAs);
 }
 
 /**
