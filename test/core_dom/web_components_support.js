@@ -1,10 +1,13 @@
 /**
  * Used to create Javascript Web Components from Dart tests
+ *
+ * The prototype must inherit from `HTMLElement`.
+ *
+ * see http://w3c.github.io/webcomponents/spec/custom/#extensions-to-document-interface-to-register
  */
 function angularTestsRegisterElement(name, prototype) {
-  // Polymer requires that all prototypes are chained to HTMLElement
-  // https://github.com/Polymer/CustomElements/issues/121
-  prototype.__proto__ = HTMLElement.prototype;
-  prototype.createdCallback = function() {};
+  function F() {}
+  F.prototype = HTMLElement;
+  prototype.prototype = new F();
   document.registerElement(name, {prototype: prototype});
 }
