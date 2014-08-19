@@ -5,7 +5,9 @@ function angularTestsRegisterElement(name, _prototype) {
   // Polymer requires that all prototypes are chained to HTMLElement
   // https://github.com/Polymer/CustomElements/issues/121
   _prototype = _prototype || {};
-  var prototype = Object.create(HTMLElement);
+  function F() {}
+  F.prototype = HTMLElement;
+  var prototype = new F();
   for (var p in _prototype) {
     if (_prototype.hasOwnProperty(p)) {
       prototype[p] = _prototype[p];

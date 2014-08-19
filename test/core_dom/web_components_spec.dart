@@ -11,7 +11,7 @@ registerElement(String name, prototype) {
 
 
 main() {
-  describe('WebComponent support', () {
+  ddescribe('WebComponent support', () {
     TestBed _;
 
     /**
@@ -43,10 +43,10 @@ main() {
     beforeEach((TestBed tb) {
       _ = tb;
     });
-    
+
     it('should create custom elements', () {
       registerElement('tests-basic', {'prop-x': 6});
-      
+
       // Create a web component
       compileAndUpgrade('<tests-basic></tests-basic>');
       expect(customProp('prop-x')).toEqual(6);
@@ -71,7 +71,7 @@ main() {
       _.rootScope.apply();
       expect(customProp('new-prop')).toEqual(27);
     });
-    
+
     it('should bind to both directives and properties', () {
       registerElement('tests-double', {});
       compileAndUpgrade('<tests-double ng-bind bind-ng-bind="\'hello\'"></tests-double>');
