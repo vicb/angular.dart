@@ -1,10 +1,16 @@
 /**
  * Used to create Javascript Web Components from Dart tests
  */
-function angularTestsRegisterElement(name, prototype) {
+function angularTestsRegisterElement(name, _prototype) {
   // Polymer requires that all prototypes are chained to HTMLElement
   // https://github.com/Polymer/CustomElements/issues/121
-  prototype.__proto__ = HTMLElement.prototype;
+  _prototype = _prototype || {};
+  var prototype = Object.create(HTMLElement);
+  for (var p in _prototype) {
+    if (_prototype.hasOwnProperty(p)) {
+      prototype[p] = _prototype[p];
+    }
+  }
   prototype.createdCallback = function() {};
   document.registerElement(name, {prototype: prototype});
 }
