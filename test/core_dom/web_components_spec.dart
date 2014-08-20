@@ -11,7 +11,7 @@ registerElement(String name, prototype) {
 
 
 main() {
-  ddescribe('WebComponent support', () {
+  describe('WebComponent support', () {
     TestBed _;
 
     /**
