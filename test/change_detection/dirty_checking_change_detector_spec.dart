@@ -976,6 +976,23 @@ void addListSpec({bool useObservable}) {
           moves: ['b[1 -> 0]', 'a[0 -> 1]'],
           removals: []));
     }));
+
+    iit('should list reference changes', () {
+      var list = listFactory(['a']);
+      var record = detector.watch(list, null, null);
+      if (detector.collectChanges().moveNext()) {
+        detector.collectChanges();
+      }
+
+      record.object = listFactory(['b']);
+      var iterator = detector.collectChanges()..moveNext();
+      expect(iterator.current.currentValue, toEqualCollectionRecord(
+          collection: ['b[null -> 0]'],
+          previous: ['a[0 -> null]'],
+          additions: ['b[null -> 0]'],
+          moves: [],
+          removals: ['a[0 -> null]']));
+    });
   });
 }
 
