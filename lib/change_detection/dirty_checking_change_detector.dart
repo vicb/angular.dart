@@ -583,13 +583,15 @@ class DirtyCheckingRecord<H> implements Record<H>, WatchRecord<H> {
         _mode = _MODE_NOOP_;
         break;
       case _MODE_MAP_NOTIFIED_:
-        _mode = _MODE_NOOP_; // no-op until next notification
-        return (currentValue as _MapChangeRecord)._check(object);
+        var dirty = (currentValue as _MapChangeRecord)._check(object);
+        if (!dirty) _mode = _MODE_NOOP_;
+        return dirty;
       case _MODE_MAP_:
         return (currentValue as _MapChangeRecord)._check(object);
       case _MODE_LIST_NOTIFIED_:
-        _mode = _MODE_NOOP_; // no-op until next notification
-        return (currentValue as _CollectionChangeRecord)._check(object);
+        var dirty = (currentValue as _CollectionChangeRecord)._check(object);
+        if (!dirty) _mode = _MODE_NOOP_;
+        return dirty;
       case _MODE_ITERABLE_:
         return (currentValue as _CollectionChangeRecord)._check(object);
       default:
